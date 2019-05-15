@@ -21,22 +21,19 @@ namespace TransmissionRC{
 	std::string port;
 	std::string sessionID;
 	std::string requestData;
-	std::string method;
  } TransmissionRequest;
 
- class rcTorrent{
-	public:
+
+ typedef struct{
 	std::string Name;
-};
+}rcTorrent;
 
 
-//public:
- void test();
- //};
- TransmissionResponse& MakeRequest(TransmissionRequest);
+ TransmissionRequest& MakeRequest();
+ TransmissionResponse& DoRequest(TransmissionRequest);
 
 
-//curl stuff
+
  size_t header_callback(char * buff, size_t size,size_t nitems, void *data);
  size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp);
 

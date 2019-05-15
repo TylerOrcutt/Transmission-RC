@@ -1,9 +1,10 @@
 #include "config.h"
-using namespace TransmissionRC::Config;
-std::map<std::string,std::string> TransmissionRC::Config::loadConfig(){
+using namespace TransmissionRC;
+std::map<std::string,std::string> Config::loadConfig(){
 	std::cout<<"Loading config\n\n";
 	std::map<std::string,std::string> cfg;
-	std::ifstream rf(cfgPath,std::ios::in);
+	std::string path = std::string(getenv("HOME"))+"/.config/trc.conf";
+	std::ifstream rf(path,std::ios::in);
 	if(rf.is_open()){
 	   	//std::cout<<"opened file\r\n";
 		std::string line;
@@ -14,7 +15,9 @@ std::map<std::string,std::string> TransmissionRC::Config::loadConfig(){
 			std::string key = line.substr(0,pos);
 			std::string value = line.substr(pos+1);
 			cfg.insert(std::pair<std::string,std::string>(key,value));
+	   		//config.insert(std::pair<std::string,std::string>(key,value));
 			//std::cout<<"key: "<<key<<"  value:"<<value<<"\r\n";
+	///		std::cout<<config[key]<<std::endl;
 		 }
 
 	rf.close();

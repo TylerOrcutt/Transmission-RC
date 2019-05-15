@@ -1,6 +1,9 @@
 #include<iostream>
 #include<curl/curl.h>
 #include<map>
+#include <sstream>
+#include<string>
+#include<vector>
 #include "TransmissionRC.h"
 #include "TransmissionRPCRequest.h"
 #include "config.h"
@@ -9,30 +12,23 @@ using namespace TransmissionRC;
 
 void handleArgs(int ags, char ** argv);
 
+std::map<std::string,std::string> Config::config;
+std::string Config::sessionID;
+
 int main(int args, char **argv){
 
-TransmissionRC::test();
-std::map<std::string,std::string> cfg = TransmissionRC::Config::loadConfig();
+Config::config = Config::loadConfig();
 
-//TransmissionRC::rcTorrent * torrent = TransmissionRC::getTorrents();
-//std::cout<<"Torrent : "<<torrent->Name<<"\r\n";
-//free(torrent);
 
-TransmissionRequest request;
-request.username = cfg["username"];
-request.password=cfg["password"];
-request.host=cfg["host"];
-request.port=cfg["port"];
+TransmissionRequest request = TransmissionRC::MakeRequest();
+//need a session ID
+TransmissionResponse response = TransmissionRC::DoRequest(request);
+Config::sessionID = response.sessionID;
 
-TransmissionResponse response = TransmissionRC::MakeRequest(request);
-std::cout<<response.sessionID<<"\r\n";
-request.sessionID = response.sessionID;
-response = TransmissionRC::MakeRequest(request);
-
-std::cout<<response.statusCode<<"\r\n";
-std::cout<<response.sessionID<<"\r\n";
-std::cout<<response.response<<"\r\n";
-
+std::vector<TransmissionRC::rcTorrent> torrents = TransmissionRC::getTorrents();
+for(int i=0;i<torrents.size();i++){
+	std::cout<<torrents[i].Name<<std::endl;
+}
 return 0;
 }
 

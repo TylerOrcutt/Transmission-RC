@@ -1,10 +1,10 @@
 #include "TransmissionRC.h"
 #include <curl/curl.h>
+#include "config.h"
 using namespace TransmissionRC;
-void TransmissionRC::test(){
- std::cout<<"test\r\n\r\n";
-}
-TransmissionRC::TransmissionResponse & TransmissionRC::MakeRequest(TransmissionRequest request){
+
+TransmissionRC::TransmissionResponse & TransmissionRC::DoRequest(
+						TransmissionRequest request){
 	curl_global_init(CURL_GLOBAL_ALL);
 	std::string readBuffer;
 	//std::string headerBuffer;
@@ -26,8 +26,8 @@ TransmissionRC::TransmissionResponse & TransmissionRC::MakeRequest(TransmissionR
 
 	curl_easy_setopt(hdlr,CURLOPT_HTTPHEADER,headers);
 //requst data
-	curl_easy_setopt(hdlr,CURLOPT_POSTFIELDS,
-		"{ \"arguments\":{\"fields\":[\"id\",\"name\"]},\"method\":\"torrent-get\"}");
+	curl_easy_setopt(hdlr,CURLOPT_POSTFIELDS,request.requestData.c_str());
+//	"{ \"arguments\":{\"fields\":[\"id\",\"name\"]},\"method\":\"torrent-get\"}");
 	curl_easy_setopt(hdlr,CURLOPT_HEADERFUNCTION,header_callback);
 	curl_easy_setopt(hdlr,CURLOPT_HEADERDATA,&headerBuffer);
 	curl_easy_setopt(hdlr,CURLOPT_WRITEFUNCTION,write_data);
@@ -47,6 +47,18 @@ TransmissionRC::TransmissionResponse & TransmissionRC::MakeRequest(TransmissionR
 	response->statusCode = headerBuffer["status"];
   return *response;
  }
+
+ TransmissionRequest & TransmissionRC::MakeRequest(){
+	TransmissionRC::TransmissionRequest * request = new TransmissionRequest();
+	request->username=Config::config["username"];
+	request->password=Config::config["password"];
+	request->host=Config::config["host"];
+	request->port=Config::config["port"];
+
+	return *request;
+}
+
+
 
  size_t TransmissionRC::write_data(void *buffer,size_t size, size_t nmemb, void *usrp){
 	((std::string*)usrp)->append((char*)buffer,size*nmemb);
