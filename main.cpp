@@ -20,14 +20,19 @@ int main(int args, char **argv){
 Config::config = Config::loadConfig();
 
 
-TransmissionRequest request = TransmissionRC::MakeRequest();
 //need a session ID
+TransmissionRequest request = TransmissionRC::MakeRequest();
 TransmissionResponse response = TransmissionRC::DoRequest(request);
 Config::sessionID = response.sessionID;
 
 std::vector<TransmissionRC::rcTorrent> torrents = TransmissionRC::getTorrents();
 for(int i=0;i<torrents.size();i++){
-	std::cout<<torrents[i].Name<<std::endl;
+	std::cout<<torrents[i].ID<<" | "
+	<<torrents[i].Name<<" | "
+	<<torrents[i].totalSize<<" | "
+	<<torrents[i].percentDone<<" | "
+	<<c_trStatus[torrents[i].Status]
+	<<std::endl;
 }
 return 0;
 }

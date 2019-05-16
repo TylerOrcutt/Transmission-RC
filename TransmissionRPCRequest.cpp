@@ -7,7 +7,16 @@ std::vector<rcTorrent>&TransmissionRC::getTorrents(){
 
 	TransmissionRequest request = MakeRequest();
 	request.sessionID = Config::sessionID;
-	request.requestData = "{ \"arguments\":{\"fields\":[\"id\",\"name\"]},\"method\":\"torrent-get\"}";
+	request.requestData = "{ \"arguments\":{\"fields\":["
+							"\"id\","
+						   	"\"name\","
+							"\"status\","
+							"\"rateDownload\","
+							"\"rateUpload\","
+							"\"isFinished\","
+							"\"totalSize\""
+							"\"percentDone\""
+							"]},\"method\":\"torrent-get\"}";
 
 	TransmissionResponse response =	DoRequest(request);
 
@@ -24,7 +33,12 @@ std::vector<rcTorrent>&TransmissionRC::getTorrents(){
 //	assert(v.first.empty());
 	//std::cout<<v.second.get<std::string>("name")<<std::endl;
 		rcTorrent torrent;
+		torrent.ID = v.second.get<int>("id");
 		torrent.Name = v.second.get<std::string>("name");
+		torrent.Status = v.second.get<int>("status");
+
+		torrent.totalSize = v.second.get<unsigned long>("totalSize");
+		torrent.percentDone = v.second.get<double>("percentDone");
 		torrents->push_back(torrent);
 	    }
 

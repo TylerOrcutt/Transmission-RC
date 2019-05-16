@@ -24,9 +24,36 @@ namespace TransmissionRC{
  } TransmissionRequest;
 
 
+ typedef enum{
+	TR_STATUS_STOPPED = 0,
+	TR_STATUS_CHECK_WAIT =1,
+	TR_STATUS_CHECK = 2,
+	TR_STATUS_DOWNLOAD_WAIT = 3,
+	TR_STATUS_DOWNLOAD = 4,
+	TR_STATUS_SEED_WAIT = 5,
+	TR_STATUS_SEED = 6
+}trStatus;
+
+ static const char * c_trStatus[] = {"STOPPED",
+				     "CHECK WAIT",
+				     "WAIT",
+				     "DOWNLOAD WAIT",
+				     "DOWNLOADING",
+				     "SEED WAIT",
+				     "SEEDING"
+				    };
+
  typedef struct{
+	int ID;
 	std::string Name;
+	int Status;
+	int rateDownload;
+	int rateUpload;
+	bool isFinished;
+	unsigned long totalSize;
+	double percentDone=0;
 }rcTorrent;
+
 
 
  TransmissionRequest& MakeRequest();
