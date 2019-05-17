@@ -1,2 +1,2 @@
 all: *.cpp
-	g++ *.cpp -lcurl -o TransmissionRC
+	g++ *.cpp -lcurl -lncurses -o TransmissionRC
