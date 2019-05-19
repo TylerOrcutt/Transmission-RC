@@ -2,7 +2,7 @@
 #include "config.h"
 using namespace TransmissionRC;
 
-std::vector<rcTorrent>&TransmissionRC::getTorrents(){
+std::vector<rcTorrent>*TransmissionRC::getTorrents(){
 	std::vector<rcTorrent> * torrents=new std::vector<rcTorrent>;
 
 	TransmissionRequest request = MakeRequest();
@@ -37,14 +37,45 @@ std::vector<rcTorrent>&TransmissionRC::getTorrents(){
 		torrent.Name = v.second.get<std::string>("name");
 		torrent.Status = v.second.get<int>("status");
 		torrent.rateDownload = v.second.get<int>("rateDownload");
+		torrent.rateUpload = v.second.get<int>("rateUpload");
 		torrent.totalSize = v.second.get<unsigned long>("totalSize");
 		torrent.percentDone = v.second.get<double>("percentDone");
 		torrents->push_back(torrent);
 	    }
 
 	}catch(std::exception const &e){
-	    std::cout<<"error: "<<e.what()<<"\r\n";
+//	    std::cout<<"error: "<<e.what()<<"\r\n";
+	   return NULL;
 	}
-	return *torrents;
+
+	return torrents;
 }
 
+
+bool TransmissionRC::resumeTorrent(int id){
+	
+	TransmissionRequest request = MakeRequest();
+	request.sessionID = Config::sessionID;
+	std::stringstream req;
+	req<<"{ \"arguments\":{\"ids\":["<<id<<"]},\"method\":\"torrent-start\"}";
+	request.requestData =req.str();
+	TransmissionResponse response =	DoRequest(request);
+	if(response.statusCode =="200"){
+		return true;
+	}
+	return false;
+}
+
+bool TransmissionRC::stopTorrent(int id){
+	
+	TransmissionRequest request = MakeRequest();
+	request.sessionID = Config::sessionID;
+	std::stringstream req;
+	req<<"{ \"arguments\":{\"ids\":["<<id<<"]},\"method\":\"torrent-stop\"}";
+	request.requestData =req.str();
+	TransmissionResponse response =	DoRequest(request);
+	if(response.statusCode =="200"){
+		return true;
+	}
+	return false;
+}

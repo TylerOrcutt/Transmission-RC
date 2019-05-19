@@ -8,8 +8,9 @@
 namespace TransmissionRC{
 
 
-std::vector<TransmissionRC::rcTorrent> & getTorrents();
-
+std::vector<TransmissionRC::rcTorrent> * getTorrents();
+bool resumeTorrent(int id);
+bool stopTorrent(int id);
 
 
 }
