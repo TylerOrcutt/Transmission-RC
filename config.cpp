@@ -1,7 +1,7 @@
 #include "config.h"
 using namespace TransmissionRC;
 std::map<std::string,std::string> Config::loadConfig(){
-	std::cout<<"Loading config\n\n";
+//	std::cout<<"Loading config\n\n";
 	std::map<std::string,std::string> cfg;
 	std::string path = std::string(getenv("HOME"))+"/.config/trc.conf";
 	std::ifstream rf(path,std::ios::in);
@@ -25,6 +25,6 @@ std::map<std::string,std::string> Config::loadConfig(){
 	return cfg;
 	}
 
-	std::cout<<"error opening file\r\n";
+	//std::cout<<"error opening file\r\n";
   return cfg;
 }

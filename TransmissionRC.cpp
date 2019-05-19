@@ -9,8 +9,8 @@ TransmissionRC::TransmissionResponse & TransmissionRC::DoRequest(
 	std::string readBuffer;
 	//std::string headerBuffer;
 	std::map<std::string,std::string>headerBuffer;
-	std::cout<<"Making transmission "
-	<<"request\r\n";
+//	std::cout<<"Making transmission "
+	//<<"request\r\n";
 
 	auto hdlr = curl_easy_init();
 

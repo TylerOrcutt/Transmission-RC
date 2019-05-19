@@ -14,7 +14,7 @@ std::vector<rcTorrent>&TransmissionRC::getTorrents(){
 							"\"rateDownload\","
 							"\"rateUpload\","
 							"\"isFinished\","
-							"\"totalSize\""
+							"\"totalSize\","
 							"\"percentDone\""
 							"]},\"method\":\"torrent-get\"}";
 
