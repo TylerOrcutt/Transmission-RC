@@ -20,6 +20,8 @@ void TransmissionRC::runUI(){
 	start_color();
 	getmaxyx(stdscr,screenmx,screenmy);
 
+	init_pair(1,COLOR_BLACK,COLOR_GREEN);
+
 	 winH = screenmx -3;
 	 winW = screenmy-10;
 	clear();
@@ -42,7 +44,7 @@ void TransmissionRC::getKeyPress(){
 		int ch = getch();
 		switch (ch){
 			case 'j':
-			if(my>winH-3 && toffset<torrents.size()){
+			if(my>winH-4 && toffset<torrents.size()){
 				toffset++;
 			}else if(my<winH){
 				my+=3;
@@ -59,6 +61,9 @@ void TransmissionRC::getKeyPress(){
 			case 'q':
 			running=false;
 			break;
+			case 'r':
+			torrents=TransmissionRC::getTorrents();
+			break;
 		}
 }
 
@@ -69,11 +74,42 @@ void TransmissionRC::drawScreen(){
 		if(posy==my){
 	//	  wmove(stdscr,posy,10);
 		  wattron(torwin,A_STANDOUT);
+		  wattron(torwin,COLOR_PAIR(1));
 		  mvwprintw(torwin,posy,0,torrents[t].Name.c_str());
+		  posy++;
+		  std::string ln = "";
+		  ln.insert(ln.begin(),
+				(winW-2)*torrents[t].percentDone,'*');
+		  ln.insert(ln.end(),
+			      (winW-2)*(1-torrents[t].percentDone),'-');
+		  ln.insert(ln.begin(),1,'[');
+		  ln.insert(ln.end(),1,']');
+		  std::stringstream strper;
+		  strper<<(torrents[t].percentDone*100);
+		 ln.replace(((ln.length()-2)/2)-(strper.str().length()/2),
+			   strper.str().length(),
+			   strper.str().c_str());
+		  mvwprintw(torwin,posy,0,ln.c_str());
+
 		  wattroff(torwin,A_STANDOUT);
+		  wattroff(torwin,COLOR_PAIR(1));
 
 		}else{
 		 mvwprintw(torwin,posy,0,torrents[t].Name.c_str());
+		  posy++;
+		  std::string ln = "";
+		  ln.insert(ln.begin(),
+				(winW-2)*torrents[t].percentDone,'*');
+		  ln.insert(ln.end(),
+			      (winW-2)*(1-torrents[t].percentDone),'-');
+		  ln.insert(ln.begin(),1,'[');
+		  ln.insert(ln.end(),1,']');
+		  std::stringstream strper;
+		  strper<<(torrents[t].percentDone*100);
+		 ln.replace(((ln.length()-2)/2)-(strper.str().length()/2),
+			   strper.str().length(),
+			   strper.str().c_str());
+		  mvwprintw(torwin,posy,0,ln.c_str());
 		}
 	}
 	wrefresh(torwin);
