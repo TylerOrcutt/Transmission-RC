@@ -36,7 +36,7 @@ std::vector<rcTorrent>&TransmissionRC::getTorrents(){
 		torrent.ID = v.second.get<int>("id");
 		torrent.Name = v.second.get<std::string>("name");
 		torrent.Status = v.second.get<int>("status");
-
+		torrent.rateDownload = v.second.get<int>("rateDownload");
 		torrent.totalSize = v.second.get<unsigned long>("totalSize");
 		torrent.percentDone = v.second.get<double>("percentDone");
 		torrents->push_back(torrent);
