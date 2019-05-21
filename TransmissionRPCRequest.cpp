@@ -1,12 +1,32 @@
 #include "TransmissionRPCRequest.h"
 #include "config.h"
+#include<mutex>
 using namespace TransmissionRC;
+std::mutex msx;
+
+
+bool TransmissionRC::authenticate(){
+	TransmissionRequest request = MakeRequest();
+	TransmissionResponse response = TransmissionRC::DoRequest(request);
+	
+	//if(response.sessionID != ""){
+	std::cout<<"\r\n"<<response.sessionID<<std::endl;
+	std::cout<<"setting session ID\r\n"<<response.sessionID<<std::endl;
+//	msx.lock();
+	  TransmissionRC::Config::sessionID = response.sessionID;	
+//	msx.unlock();
+	  return true;
+	//}else{	
+	 //return false;
+	//}
+}
+
 
 std::vector<rcTorrent>*TransmissionRC::getTorrents(){
 	std::vector<rcTorrent> * torrents=new std::vector<rcTorrent>;
 
 	TransmissionRequest request = MakeRequest();
-	request.sessionID = Config::sessionID;
+	//request.sessionID = Config::sessionID;
 	request.requestData = "{ \"arguments\":{\"fields\":["
 							"\"id\","
 						   	"\"name\","
@@ -16,10 +36,11 @@ std::vector<rcTorrent>*TransmissionRC::getTorrents(){
 							"\"isFinished\","
 							"\"totalSize\","
 							"\"percentDone\""
-							"]},\"method\":\"torrent-get\"}";
+							"]},\""
+							"method\":\"torrent-get\"}";
 
 	TransmissionResponse response =	DoRequest(request);
-
+	//Config::sessionID = response.sessionID;
 	std::stringstream ss;
 	ss<<response.response;
 
@@ -45,6 +66,8 @@ std::vector<rcTorrent>*TransmissionRC::getTorrents(){
 
 	}catch(std::exception const &e){
 //	    std::cout<<"error: "<<e.what()<<"\r\n";
+//	std::cout<<response.response<<std::endl
+//	<<"\r\n'"<<Config::sessionID<<"'"<<std::endl;
 	   return NULL;
 	}
 
@@ -55,11 +78,12 @@ std::vector<rcTorrent>*TransmissionRC::getTorrents(){
 bool TransmissionRC::resumeTorrent(int id){
 	
 	TransmissionRequest request = MakeRequest();
-	request.sessionID = Config::sessionID;
+	//request.sessionID = Config::sessionID;
 	std::stringstream req;
 	req<<"{ \"arguments\":{\"ids\":["<<id<<"]},\"method\":\"torrent-start\"}";
 	request.requestData =req.str();
 	TransmissionResponse response =	DoRequest(request);
+	//Config::sessionID = response.sessionID;
 	if(response.statusCode =="200"){
 		return true;
 	}
@@ -69,11 +93,12 @@ bool TransmissionRC::resumeTorrent(int id){
 bool TransmissionRC::stopTorrent(int id){
 	
 	TransmissionRequest request = MakeRequest();
-	request.sessionID = Config::sessionID;
+	//request.sessionID = Config::sessionID;
 	std::stringstream req;
 	req<<"{ \"arguments\":{\"ids\":["<<id<<"]},\"method\":\"torrent-stop\"}";
 	request.requestData =req.str();
 	TransmissionResponse response =	DoRequest(request);
+	//Config::sessionID = response.sessionID;
 	if(response.statusCode =="200"){
 		return true;
 	}

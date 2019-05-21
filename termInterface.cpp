@@ -18,24 +18,33 @@ std::mutex mtx;
 std::string statusMsg="";
 void TransmissionRC::updateThread(){
 
+//	TransmissionRC::init();
 	while(running){
 	 mtx.lock();
 	if(torrents!=NULL){
 	free(torrents);
 	}
 	torrents = TransmissionRC::getTorrents();
-	drawScreen();
+//TODO fix this session refresh shit
+	if(torrents==NULL){
+		if(TransmissionRC::authenticate()){
+  			torrents = TransmissionRC::getTorrents();
+		}
+	}
 
 	 mtx.unlock();
 	//sleep(100);
+	drawScreen();
 	std::this_thread::sleep_for(std::chrono::milliseconds(2500));
 	}
+//	TransmissionRC::cleanup();
 
 }
 
 void TransmissionRC::runUI(){
  //torrents = TransmissionRC::getTorrents();
 
+	TransmissionRC::init();
 	initscr();
 	noecho();
 	curs_set(0);
@@ -66,15 +75,16 @@ void TransmissionRC::runUI(){
 	}
 
 endwin();
+TransmissionRC::cleanup();
 }
 
 void TransmissionRC::getKeyPress(){
 		int ch = getch();
 		switch (ch){
 			case 'j':
-			if(my>=winH-4 && toffset<torrents->size()){
+			if(my/4>=winH/4-1 &&torrents!=NULL && toffset<torrents->size()){
 				toffset++;
-			}else if(my<winH-4){
+			}else if(my/4<=winH/4 - 2){
 				my+=4;
 			}
 			  break;
@@ -90,18 +100,20 @@ void TransmissionRC::getKeyPress(){
 			running=false;
 			break;
 			case 'r':
-			torrents=TransmissionRC::getTorrents();
+
 			break;
 			//start stop
 			case 's':
+			if(torrents==NULL){break;}
 			 int id = my/4 + toffset;
+			std::stringstream ss;
 			 if((*torrents)[id].Status ==0){
-			  TransmissionRC::resumeTorrent((*torrents)[id].ID);
+			  bool r = TransmissionRC::resumeTorrent((*torrents)[id].ID);
+			  ss<<"resuming "<<(*torrents)[id].Name;
 			}else{
 			  TransmissionRC::stopTorrent((*torrents)[id].ID);
+			  ss<<"stopping "<<(*torrents)[id].Name;
 			}
-			std::stringstream ss;
-			ss<<id<< " selected";
 			  statusMsg = ss.str();
 			   break;
 		}
@@ -109,10 +121,10 @@ void TransmissionRC::getKeyPress(){
 
 void TransmissionRC::drawScreen(){
 	werase(torwin);
-//mtx.lock();
+mtx.lock();
 	for(int i=0,t=toffset;torrents !=NULL &&t<torrents->size();i++,t++){
 		int posy = i+(i*3);
-		if(posy>=winH){
+		if(posy/4>=winH/4){
 		  break;
 		}
 		if(posy==my){
@@ -149,7 +161,7 @@ void TransmissionRC::drawScreen(){
 		  wattroff(torwin,A_STANDOUT);
 		  wattroff(torwin,COLOR_PAIR(1));
 	}
-//mtx.unlock();
+mtx.unlock();
 //draw status msg;
 	mvwprintw(torwin,winH-1,0,statusMsg.c_str());
 	wrefresh(stdscr);

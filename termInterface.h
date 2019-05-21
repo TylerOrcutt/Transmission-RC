@@ -13,9 +13,11 @@ namespace TransmissionRC{
 	void updateThread();
 	typedef struct{
 		int offset=0;
-		int my,mx;
-		int winH;
-		int winW;
+		int my=0,mx=0;
+		int posx=0,posy=0;
+		WINDOW * win;
+		int winH=0;
+		int winW=0;
 	}tcWindow;
 
 

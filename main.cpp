@@ -16,25 +16,25 @@ using namespace TransmissionRC;
 void handleArgs(int ags, char ** argv);
 
 std::map<std::string,std::string> Config::config;
-std::string Config::sessionID;
+std::string Config::sessionID="";
 
 int main(int args, char **argv){
+	TransmissionRC::init();
 
 	Config::config = Config::loadConfig();
-
 //need a session ID
-	TransmissionRequest request = TransmissionRC::MakeRequest();
-	TransmissionResponse response = TransmissionRC::DoRequest(request);
-	Config::sessionID = response.sessionID;
-
+//	TransmissionRequest request = TransmissionRC::MakeRequest();
+//	TransmissionResponse response = TransmissionRC::DoRequest(request);
+//	Config::sessionID = response.sessionID;
+	TransmissionRC::authenticate();
 	TransmissionRC::runUI();
-
-// torrents = TransmissionRC::getTorrents();
+TransmissionRC::cleanup();
+// std::vector<rcTorrent>*torrents = TransmissionRC::getTorrents();
 //for(int i=0;i<torrents.size();i++){
 //	std::cout<<torrents[i].ID<<" | "
-//	<<torrents[i].Name<<" | "
-//	<<torrents[i].totalSize<<" | "
-//	<<torrents[i].percentDone<<" | "
+//	<<torrents[i]->Name<<" | "
+//	<<torrents[i]->totalSize<<" | "
+//	<<torrents[i]->percentDone<<" | "
 //	<<c_trStatus[torrents[i].Status]
 //	<<std::endl;
 //}

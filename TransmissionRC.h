@@ -55,9 +55,10 @@ namespace TransmissionRC{
 }rcTorrent;
 
 
-
- TransmissionRequest& MakeRequest();
- TransmissionResponse& DoRequest(TransmissionRequest);
+ void init();
+ void cleanup();
+ TransmissionRequest MakeRequest();
+ TransmissionResponse & DoRequest(TransmissionRequest);
 
 
 
