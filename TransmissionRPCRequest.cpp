@@ -1,8 +1,6 @@
 #include "TransmissionRPCRequest.h"
 #include "config.h"
-#include<mutex>
 using namespace TransmissionRC;
-std::mutex msx;
 
 
 bool TransmissionRC::authenticate(){
@@ -10,11 +8,8 @@ bool TransmissionRC::authenticate(){
 	TransmissionResponse response = TransmissionRC::DoRequest(request);
 	
 	//if(response.sessionID != ""){
-	std::cout<<"\r\n"<<response.sessionID<<std::endl;
-	std::cout<<"setting session ID\r\n"<<response.sessionID<<std::endl;
-//	msx.lock();
-	  TransmissionRC::Config::sessionID = response.sessionID;	
-//	msx.unlock();
+
+	TransmissionRC::Config::sessionID = response.sessionID;	
 	  return true;
 	//}else{	
 	 //return false;
@@ -40,7 +35,6 @@ std::vector<rcTorrent>*TransmissionRC::getTorrents(){
 							"method\":\"torrent-get\"}";
 
 	TransmissionResponse response =	DoRequest(request);
-	//Config::sessionID = response.sessionID;
 	std::stringstream ss;
 	ss<<response.response;
 
@@ -52,7 +46,6 @@ std::vector<rcTorrent>*TransmissionRC::getTorrents(){
 	    BOOST_FOREACH(boost::property_tree::ptree::value_type &v,
 					pt.get_child("arguments.torrents")){
 //	assert(v.first.empty());
-	//std::cout<<v.second.get<std::string>("name")<<std::endl;
 		rcTorrent torrent;
 		torrent.ID = v.second.get<int>("id");
 		torrent.Name = v.second.get<std::string>("name");
@@ -68,6 +61,7 @@ std::vector<rcTorrent>*TransmissionRC::getTorrents(){
 //	    std::cout<<"error: "<<e.what()<<"\r\n";
 //	std::cout<<response.response<<std::endl
 //	<<"\r\n'"<<Config::sessionID<<"'"<<std::endl;
+	   free(torrents);
 	   return NULL;
 	}
 
@@ -83,7 +77,7 @@ bool TransmissionRC::resumeTorrent(int id){
 	req<<"{ \"arguments\":{\"ids\":["<<id<<"]},\"method\":\"torrent-start\"}";
 	request.requestData =req.str();
 	TransmissionResponse response =	DoRequest(request);
-	//Config::sessionID = response.sessionID;
+
 	if(response.statusCode =="200"){
 		return true;
 	}
@@ -98,7 +92,7 @@ bool TransmissionRC::stopTorrent(int id){
 	req<<"{ \"arguments\":{\"ids\":["<<id<<"]},\"method\":\"torrent-stop\"}";
 	request.requestData =req.str();
 	TransmissionResponse response =	DoRequest(request);
-	//Config::sessionID = response.sessionID;
+
 	if(response.statusCode =="200"){
 		return true;
 	}

@@ -16,35 +16,36 @@ bool running=true;
 	int winW = 0;
 std::mutex mtx;
 std::string statusMsg="";
+
 void TransmissionRC::updateThread(){
 
-//	TransmissionRC::init();
 	while(running){
-	 mtx.lock();
+	mtx.lock();
+
 	if(torrents!=NULL){
-	free(torrents);
+		free(torrents);
+		torrents=NULL;
 	}
+
 	torrents = TransmissionRC::getTorrents();
-//TODO fix this session refresh shit
+
 	if(torrents==NULL){
 		if(TransmissionRC::authenticate()){
   			torrents = TransmissionRC::getTorrents();
 		}
 	}
+	mtx.unlock();
 
-	 mtx.unlock();
-	//sleep(100);
 	drawScreen();
 	std::this_thread::sleep_for(std::chrono::milliseconds(2500));
-	}
-//	TransmissionRC::cleanup();
 
+	}
 }
 
 void TransmissionRC::runUI(){
- //torrents = TransmissionRC::getTorrents();
 
 	TransmissionRC::init();
+
 	initscr();
 	noecho();
 	curs_set(0);
@@ -74,8 +75,8 @@ void TransmissionRC::runUI(){
 		//wmove(torwin,my,mx);
 	}
 
-endwin();
-TransmissionRC::cleanup();
+	endwin();
+	TransmissionRC::cleanup();
 }
 
 void TransmissionRC::getKeyPress(){

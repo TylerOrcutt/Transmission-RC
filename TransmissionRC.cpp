@@ -15,10 +15,7 @@ void TransmissionRC::cleanup(){
 TransmissionRC::TransmissionResponse & TransmissionRC::DoRequest(
 						TransmissionRequest request){
 	std::string readBuffer;
-	//std::string headerBuffer;
 	std::map<std::string,std::string>headerBuffer;
-//	std::cout<<"Making transmission "
-	//<<"request\r\n";
 
 	auto hdlr = curl_easy_init();
 
@@ -31,15 +28,13 @@ TransmissionRC::TransmissionResponse & TransmissionRC::DoRequest(
 			url.c_str());
 //headers
 	struct curl_slist *headers=NULL;
-	//std::cout<<"\r\n'"<<request.sessionID<<"'"<<std::endl;
 	std::string hdr_sessionID = "X-Transmission-Session-Id:" + request.sessionID;
 	headers= curl_slist_append(headers,hdr_sessionID.c_str());
 
 //	curl_easy_setopt(hdlr,CURLOPT_VERBOSE,1L);
 	curl_easy_setopt(hdlr,CURLOPT_HTTPHEADER,headers);
-//requst data
+//request data
 	curl_easy_setopt(hdlr,CURLOPT_POSTFIELDS,request.requestData.c_str());
-//	"{ \"arguments\":{\"fields\":[\"id\",\"name\"]},\"method\":\"torrent-get\"}");
 	curl_easy_setopt(hdlr,CURLOPT_HEADERFUNCTION,header_callback);
 	curl_easy_setopt(hdlr,CURLOPT_HEADERDATA,&headerBuffer);
 	curl_easy_setopt(hdlr,CURLOPT_WRITEFUNCTION,write_data);
@@ -76,7 +71,10 @@ TransmissionRC::TransmissionResponse & TransmissionRC::DoRequest(
  }
 
 
- size_t TransmissionRC::header_callback(char * buff, size_t size,size_t nitems, void *data){
+ size_t TransmissionRC::header_callback(char * buff, 
+					size_t size,
+					size_t nitems, 
+					void *data){
 	std::string header(buff);
 	static const std::string statusvar = "HTTP/";
 
@@ -84,9 +82,8 @@ TransmissionRC::TransmissionResponse & TransmissionRC::DoRequest(
 		char * splt = strtok(buff," ");
 		for(int i=0; splt !=NULL;i++){
 			if(i==1){
-			  //*((std::string*)data) =std::string(splt);
 	   		  ((std::map<std::string,std::string>*)data)->insert(
-						std::pair<std::string,std::string>("status",splt));
+				std::pair<std::string,std::string>("status",splt));
 			}
 			 splt=strtok(NULL," ");
 		}
@@ -97,9 +94,8 @@ TransmissionRC::TransmissionResponse & TransmissionRC::DoRequest(
 		header=header.substr(sessionvar.length()+2);
 		header=header.substr(0,header.length()-2);
 	   	((std::map<std::string,std::string>*)data)->insert(
-					     std::pair<std::string,std::string>("sessionID",header));
-	//*((std::string*)data) = header;
+			std::pair<std::string,std::string>("sessionID",header));
 	}
-	//std::cout<<buff<<"\r\n";
+
 	return size*nitems;
  }

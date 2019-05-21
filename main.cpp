@@ -19,16 +19,12 @@ std::map<std::string,std::string> Config::config;
 std::string Config::sessionID="";
 
 int main(int args, char **argv){
-	TransmissionRC::init();
 
 	Config::config = Config::loadConfig();
 //need a session ID
-//	TransmissionRequest request = TransmissionRC::MakeRequest();
-//	TransmissionResponse response = TransmissionRC::DoRequest(request);
-//	Config::sessionID = response.sessionID;
 	TransmissionRC::authenticate();
+//start UI
 	TransmissionRC::runUI();
-TransmissionRC::cleanup();
 // std::vector<rcTorrent>*torrents = TransmissionRC::getTorrents();
 //for(int i=0;i<torrents.size();i++){
 //	std::cout<<torrents[i].ID<<" | "
