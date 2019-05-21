@@ -19,6 +19,18 @@ namespace TransmissionRC{
 		int winH=0;
 		int winW=0;
 	}tcWindow;
+	
+	enum{
+		Success=0,
+		Failure=1
+		
+	}tcStatus;
+
+	typedef struct{
+		std::string msg;
+		int status;
+		
+	}tcStatusMessage;
 
 
 };
