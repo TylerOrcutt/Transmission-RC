@@ -84,6 +84,7 @@ bool TransmissionRC::resumeTorrent(int id){
 	return false;
 }
 
+
 bool TransmissionRC::stopTorrent(int id){
 	
 	TransmissionRequest request = MakeRequest();
@@ -93,6 +94,21 @@ bool TransmissionRC::stopTorrent(int id){
 	request.requestData =req.str();
 	TransmissionResponse response =	DoRequest(request);
 
+	if(response.statusCode =="200"){
+		return true;
+	}
+	return false;
+}
+
+bool TransmissionRC::addTorrent(std::string URL){
+	
+	TransmissionRequest request = MakeRequest();
+	//request.sessionID = Config::sessionID;
+	request.requestData = "{ \"arguments\":{\"filename\":"
+				"\""+URL+"\"},\"method\":\"torrent-add\"}";
+	std::cout<<request.requestData<<std::endl<<std::endl;
+	TransmissionResponse response =	DoRequest(request);
+	std::cout<<response.response;
 	if(response.statusCode =="200"){
 		return true;
 	}

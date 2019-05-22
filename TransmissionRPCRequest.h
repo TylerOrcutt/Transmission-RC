@@ -12,6 +12,7 @@ bool authenticate();
 std::vector<TransmissionRC::rcTorrent> * getTorrents();
 bool resumeTorrent(int id);
 bool stopTorrent(int id);
+bool addTorrent(std::string);
 
 
 }
