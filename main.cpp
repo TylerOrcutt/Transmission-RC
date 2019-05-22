@@ -13,7 +13,7 @@
 
 using namespace TransmissionRC;
 
-void handleArgs(int ags, char ** argv);
+void handleArgs(int args, char ** argv);
 
 std::map<std::string,std::string> Config::config;
 std::string Config::sessionID="";
@@ -25,15 +25,6 @@ int main(int args, char **argv){
 	TransmissionRC::authenticate();
 //start UI
 	TransmissionRC::runUI();
-// std::vector<rcTorrent>*torrents = TransmissionRC::getTorrents();
-//for(int i=0;i<torrents.size();i++){
-//	std::cout<<torrents[i].ID<<" | "
-//	<<torrents[i]->Name<<" | "
-//	<<torrents[i]->totalSize<<" | "
-//	<<torrents[i]->percentDone<<" | "
-//	<<c_trStatus[torrents[i].Status]
-//	<<std::endl;
-//}
 return 0;
 }
 

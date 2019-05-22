@@ -7,11 +7,13 @@ std::vector<rcTorrent> *torrents;
 tcWindow torwin;
 
 int screenmx,screenmy;
-
 bool running=true;
-
 std::mutex mtx;
 std::string statusMsg="";
+
+bool isInserting=false;
+int pchar=0;
+std::string insertTxt="";
 
 void TransmissionRC::updateThread(){
 
@@ -30,10 +32,10 @@ void TransmissionRC::updateThread(){
   			torrents = TransmissionRC::getTorrents();
 		}
 	}
-	mtx.unlock();
 
+	mtx.unlock();
 	drawScreen();
-	std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+	std::this_thread::sleep_for(std::chrono::milliseconds(5500));
 
 	}
 }
@@ -49,16 +51,19 @@ void TransmissionRC::runUI(){
 	getmaxyx(stdscr,screenmx,screenmy);
 	//nodelay(stdscr,true);
 	init_pair(1,COLOR_WHITE,COLOR_BLACK);
-
+	init_pair(2,COLOR_WHITE, COLOR_BLUE);
 	torwin.winH = screenmx;
 	torwin.winW = screenmy;
 
 	clear();
 
 	torwin.win = newwin(torwin.winH,torwin.winW,0,0);
+				
+	//wbkgd(addTorwin.win,COLOR_PAIR(2));		
 	refresh();
 	wrefresh(torwin.win);
-
+	//box(addTorwin.win,0,0);
+	//wrefresh(addTorwin.win);
 	drawScreen();
 //update thread
 	std::thread t(TransmissionRC::updateThread);
@@ -75,12 +80,14 @@ void TransmissionRC::runUI(){
 }
 
 void TransmissionRC::getKeyPress(){
-		int ch = getch();
+
+	int ch = getch();
+
 	switch (ch){
 	case 'j':
 		if(torwin.my/4>=torwin.winH/4-1 
 		   && torrents!=NULL
-		   && torwin.offset<torrents->size()){
+		   && torwin.my/4 + torwin.offset<torrents->size()-1){
 
 			torwin.offset++;
 		}else if(torwin.my/4<=torwin.winH/4 - 2){
@@ -100,7 +107,21 @@ void TransmissionRC::getKeyPress(){
 	case 'q':
 		running=false;
 	break;
-	case 'r':
+	case 'd': 
+		if( pchar=='d'){
+		  statusMsg="Delete ?";
+		  int id = torwin.my/4 + torwin.offset;
+			std::stringstream ss;
+		   ss<<"Delete "<<(*torrents)[id].Name
+		     << "?";
+		   statusMsg = ss.str();
+		  pchar=0;
+		  return;
+		}
+
+	break;
+	case ':':
+	isInserting = true;
 	break;
 	//start stop
 	case 's':
@@ -123,9 +144,11 @@ void TransmissionRC::getKeyPress(){
 		statusMsg = ss.str();
 	break;
 	}
+	pchar=ch; 
 }
 
 void TransmissionRC::drawScreen(){
+
 	werase(torwin.win);
 	mtx.lock();
 	for(int i=0,t=torwin.offset;torrents !=NULL &&t<torrents->size();i++,t++){
@@ -184,6 +207,11 @@ void TransmissionRC::drawScreen(){
 	mtx.unlock();
 //draw status msg;
 	mvwprintw(torwin.win,torwin.winH-1,0,statusMsg.c_str());
+	
+	//werase(addTorwin.win);
+	//box(addTorwin.win,0,0);
 	wrefresh(stdscr);
 	wrefresh(torwin.win);
+	//wrefresh(addTorwin.win);
+	//mvwprintw(addTorwin.win,10,10,"test");
 }
