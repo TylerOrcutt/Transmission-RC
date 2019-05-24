@@ -43,6 +43,9 @@ void handleArgs(int args,char ** argv){
 		//	std::cout<<argv[i+1]<<std::endl;
 		}
 
-	}
 
+	}
+	if(args==2){
+		TransmissionRC::addTorrent(std::string(argv[1]));	
+	}
 }
