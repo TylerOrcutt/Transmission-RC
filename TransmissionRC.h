@@ -47,7 +47,7 @@ namespace TransmissionRC{
 	int ID;
 	std::string Name;
 	int Status;
-	int rateDownload;
+	int rateDownload=0;
 	int rateUpload=0;
 	bool isFinished;
 	unsigned long totalSize;

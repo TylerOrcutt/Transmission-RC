@@ -13,6 +13,7 @@ std::vector<TransmissionRC::rcTorrent> * getTorrents();
 bool resumeTorrent(int id);
 bool stopTorrent(int id);
 bool addTorrent(std::string);
+bool addTorrent(unsigned long,char **);
 
 
 }

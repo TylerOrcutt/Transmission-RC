@@ -55,6 +55,12 @@ std::vector<rcTorrent>*TransmissionRC::getTorrents(){
 		torrent.totalSize = v.second.get<unsigned long>("totalSize");
 		torrent.percentDone = v.second.get<double>("percentDone");
 		torrents->push_back(torrent);
+
+		if(torrent.Status==TransmissionRC::TR_STATUS_SEED
+		  && Config::config["stopSeeding"]=="true"){
+			TransmissionRC::stopTorrent(torrent.ID);	
+		}
+
 	    }
 
 	}catch(std::exception const &e){

@@ -193,8 +193,10 @@ void TransmissionRC::drawScreen(){
 		strper.str(std::string());
 		strper<<std::string("["+std::string(
 					c_trStatus[(*torrents)[t].Status])+"]")
-		      <<"  "<<"D:"<<(*torrents)[t].rateDownload
-		      <<"  "<<"U:"<<(*torrents)[t].rateUpload;
+		      <<"  "<<"D:"
+		      <<Utility::convertTransferSpeed((*torrents)[t].rateDownload)
+		      <<"  "<<"U:"
+		      <<Utility::convertTransferSpeed((*torrents)[t].rateUpload);
 
 		ln = strper.str();
 		ln.insert(ln.length(),torwin.winW-ln.length(),' ');

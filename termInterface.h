@@ -5,6 +5,7 @@
 #include<thread>
 #include<mutex>
 #include"TransmissionRPCRequest.h"
+#include "Utility.h"
 
 namespace TransmissionRC{
 	void runUI();
