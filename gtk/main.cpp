@@ -30,8 +30,10 @@ GtkWidget * makeRow(rcTorrent torrent ){
 	row = gtk_list_box_row_new();
 	
 	GtkWidget *wrapper = gtk_box_new(GTK_ORIENTATION_VERTICAL,10);
+	gtk_widget_set_name(wrapper,"bxrow");
 
 	GtkWidget * lblName  = gtk_label_new(torrent.Name.c_str());
+	gtk_widget_set_name(lblName,"rlblTitle");
 	gtk_label_set_xalign(GTK_LABEL(lblName),0);
 	gtk_box_pack_start(GTK_BOX(wrapper),lblName,false,false,0);
 
@@ -43,6 +45,7 @@ GtkWidget * makeRow(rcTorrent torrent ){
 		ss<<" U:"<<Utility::convertTransferSpeed(torrent.rateUpload);
 	}
 	GtkWidget *lblStatus = gtk_label_new(ss.str().c_str());
+	gtk_widget_set_name(lblStatus,"rlbl");
 	gtk_label_set_xalign(GTK_LABEL(lblStatus),0);
 	gtk_box_pack_start(GTK_BOX(wrapper),lblStatus,false,false,0);
 
@@ -65,14 +68,15 @@ GtkWidget * makeRow(rcTorrent torrent ){
 	ss<<" downloaded "<<(torrent.totalSize*torrent.percentDone/1024/1024)
 	<<" mb";
 	lblDL = gtk_label_new(ss.str().c_str());
+	gtk_widget_set_name(lblDL,"rlbl");
 	gtk_label_set_xalign(GTK_LABEL(lblDL),0);
 	gtk_box_pack_start(GTK_BOX(wrapper),lblDL,false,false,0);
 	
 	
 	GtkWidget *separator = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
 	gtk_widget_set_name(separator,"rsep");
-	gtk_box_pack_start(GTK_BOX(wrapper),
-			   separator,false,false,0);
+	//gtk_box_pack_start(GTK_BOX(wrapper),
+	//		   separator,false,false,0);
 	gtk_container_add(GTK_CONTAINER(row),wrapper);
 	
 	
@@ -87,8 +91,16 @@ static void activate (GtkApplication *app, gpointer user_data){
 	GtkWidget *toolbar;
 	GtkWidget *button;	
 //style
-	const char *data = "progress,trough{border-radius:5px;background-color:green;min-height:20px;}"
-			   "separator#rsep{min-height:3px; background-color:black;}";
+	const char *data = "progress,trough{border-radius:5px;"
+			   "border:1px solid grey;"
+			   "background-color:green;min-height:20px;}"
+			   "separator#rsep{min-height:3px; background-color:black;}"
+			   "box{background-color:#262626; border-radius:5px;}"
+			   "box#bxrow{padding:5px;background-color:#262626;"
+				" border-radius:5px;}"
+			   "label#rlbl{color:white;}"
+			   "label#rlblTitle{color:white;font-size:16px; font-weight:bold;}"
+			   "list{background-color:#0d0d0d}";
 	GtkCssProvider * provider = gtk_css_provider_new();
 	if(!gtk_css_provider_load_from_data(provider,data,std::strlen(data),NULL)){
 		g_print("css load failed\r\n");
