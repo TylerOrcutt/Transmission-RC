@@ -5,6 +5,7 @@
 #include "../TransmissionRC.h"
 #include "../TransmissionRPCRequest.h"
 #include "../config.h"
+#include "../Utility.h"
 
 using namespace TransmissionRC;
 
@@ -28,15 +29,50 @@ GtkWidget * makeRow(rcTorrent torrent ){
 	GtkWidget *row;
 	row = gtk_list_box_row_new();
 	
-	GtkWidget *wrapper = gtk_box_new(GTK_ORIENTATION_VERTICAL,0);
+	GtkWidget *wrapper = gtk_box_new(GTK_ORIENTATION_VERTICAL,10);
 
 	GtkWidget * lblName  = gtk_label_new(torrent.Name.c_str());
+	gtk_label_set_xalign(GTK_LABEL(lblName),0);
 	gtk_box_pack_start(GTK_BOX(wrapper),lblName,false,false,0);
+
+	std::stringstream ss;
+	ss<<c_trStatus[torrent.Status];
+
+	if(torrent.Status>0){
+		ss<<" D:"<<Utility::convertTransferSpeed(torrent.rateDownload);
+		ss<<" U:"<<Utility::convertTransferSpeed(torrent.rateUpload);
+	}
+	GtkWidget *lblStatus = gtk_label_new(ss.str().c_str());
+	gtk_label_set_xalign(GTK_LABEL(lblStatus),0);
+	gtk_box_pack_start(GTK_BOX(wrapper),lblStatus,false,false,0);
+
 	
+
 	GtkWidget *pbar = gtk_progress_bar_new();
 	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(pbar),torrent.percentDone);
+	
+	GtkStyleContext *pContext = gtk_widget_get_style_context(pbar);
+		
+
+	//gtk_style_context_save(pContext);
+	
 	gtk_box_pack_start(GTK_BOX(wrapper),pbar,false,false,0);
 
+
+
+	GtkWidget *lblDL;
+	ss.str(std::string());	
+	ss<<" downloaded "<<(torrent.totalSize*torrent.percentDone/1024/1024)
+	<<" mb";
+	lblDL = gtk_label_new(ss.str().c_str());
+	gtk_label_set_xalign(GTK_LABEL(lblDL),0);
+	gtk_box_pack_start(GTK_BOX(wrapper),lblDL,false,false,0);
+	
+	
+	GtkWidget *separator = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
+	gtk_widget_set_name(separator,"rsep");
+	gtk_box_pack_start(GTK_BOX(wrapper),
+			   separator,false,false,0);
 	gtk_container_add(GTK_CONTAINER(row),wrapper);
 	
 	
@@ -50,6 +86,16 @@ static void activate (GtkApplication *app, gpointer user_data){
 	GtkWidget *stack;
 	GtkWidget *toolbar;
 	GtkWidget *button;	
+//style
+	const char *data = "progress,trough{border-radius:5px;background-color:green;min-height:20px;}"
+			   "separator#rsep{min-height:3px; background-color:black;}";
+	GtkCssProvider * provider = gtk_css_provider_new();
+	if(!gtk_css_provider_load_from_data(provider,data,std::strlen(data),NULL)){
+		g_print("css load failed\r\n");
+	}
+	gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
+					GTK_STYLE_PROVIDER(provider),
+					GTK_STYLE_PROVIDER_PRIORITY_USER);
 
 	//window
 	window = gtk_application_window_new(app);
@@ -74,7 +120,7 @@ static void activate (GtkApplication *app, gpointer user_data){
 
 	//cancel
 	GtkToolItem * tb_cancelTorrent;
-	tb_cancelTorrent = gtk_tool_button_new(NULL,"Cancel");
+	tb_cancelTorrent = gtk_tool_button_new(NULL,"Delete");
 	g_signal_connect(tb_cancelTorrent,"clicked",
 			G_CALLBACK(tbItem_Clicked),NULL);	
 
