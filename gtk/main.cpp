@@ -24,12 +24,22 @@ static void btn1_Click(GtkWidget *widget, gpointer data){
 
 }
 
-GtkWidget * makeRow(std::string text){
+GtkWidget * makeRow(rcTorrent torrent ){
 	GtkWidget *row;
 	row = gtk_list_box_row_new();
 	
-	GtkWidget * label = gtk_label_new(text.c_str());
-	gtk_container_add(GTK_CONTAINER(row),label);
+	GtkWidget *wrapper = gtk_box_new(GTK_ORIENTATION_VERTICAL,0);
+
+	GtkWidget * lblName  = gtk_label_new(torrent.Name.c_str());
+	gtk_box_pack_start(GTK_BOX(wrapper),lblName,false,false,0);
+	
+	GtkWidget *pbar = gtk_progress_bar_new();
+	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(pbar),torrent.percentDone);
+	gtk_box_pack_start(GTK_BOX(wrapper),pbar,false,false,0);
+
+	gtk_container_add(GTK_CONTAINER(row),wrapper);
+	
+	
 
 	return row;
 }
@@ -95,7 +105,6 @@ static void activate (GtkApplication *app, gpointer user_data){
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar),
 				gtk_separator_tool_item_new(),-1);
 
-
 	
 	
 	//listbox
@@ -108,9 +117,9 @@ static void activate (GtkApplication *app, gpointer user_data){
 	std::vector<rcTorrent> *torrents = getTorrents();
 	for(int i=0;i<torrents->size();i++){
 	 gtk_list_box_insert(GTK_LIST_BOX(listbox),
-			makeRow((*torrents)[i].Name),-1);
+			makeRow((*torrents)[i]),-1);
 	}
-	
+	free(torrents);	
 
 	//test button
 	button = gtk_button_new_with_label("test");
