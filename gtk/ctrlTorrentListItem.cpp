@@ -2,12 +2,23 @@
 
 using namespace TransmissionRC;
  
-TransmissionRC::ctrlTorrentListItem * TransmissionRC::ctrlTorrentListItem::makeListItem(rcTorrent torrent ){
-	ctrlTorrentListItem * item = new ctrlTorrentListItem();
-	GtkWidget *row;
-	row = gtk_list_box_row_new();
+TransmissionRC::ctrlTorrentListItem     *TransmissionRC::ctrlTorrentListItem::makeListItem 
+										(rcTorrent torrent){
+	ctrlTorrentListItem  *item = new ctrlTorrentListItem();
+	Gtk::Box * box = new Gtk::Box();
 	
+	item->add(*box);
+	box->show();
 
+	item->lblName = new  Gtk::Label(torrent.Name.c_str());
+	item->lblName->set_name("rlblTitle");
+	box->add(*(item->lblName));
+	item->lblName->show();
+
+	//GtkWidget *row;
+	//row = gtk_list_box_row_new();
+	return item;	
+/*
 	GtkWidget *wrapper = gtk_box_new(GTK_ORIENTATION_VERTICAL,10);
 	gtk_widget_set_name(wrapper,"bxrow");
 
@@ -49,9 +60,10 @@ TransmissionRC::ctrlTorrentListItem * TransmissionRC::ctrlTorrentListItem::makeL
 	gtk_widget_set_name(separator,"rsep");
 	//gtk_box_pack_start(GTK_BOX(wrapper),
 	//		   separator,false,false,0);
-	gtk_container_add(GTK_CONTAINER(row),wrapper);
+	gtk_container_add(GTK_CONTAINER(item),wrapper);
 	
-	item->widget=row;	
+	//item->widget=row;	
 
 	return item;
+*/
 }
