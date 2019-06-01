@@ -3,7 +3,8 @@
 #include<gtkmm.h>
 #include<gtkmm/toolbar.h>
 #include<string>
-
+#include "ctrlTorrentListItem.h"
+#include "../TransmissionRPCRequest.h"
 
 namespace TransmissionRC{
 
@@ -14,9 +15,10 @@ namespace TransmissionRC{
 
 			Gtk::ToolButton * btnPause;
 			Gtk::ToolButton * btnResume;
-
+			
+			Gtk::ListBox * lstBox;
 		public:
-			ctrlTorrentToolBar();	
+			ctrlTorrentToolBar(Gtk::ListBox *);	
 			void tbOpen_Clicked();
 			void tbDelete_Clicked();
 			void tbPause_Clicked();

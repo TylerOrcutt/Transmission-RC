@@ -21,8 +21,13 @@ std::string Config::sessionID="";
 int main(int args, char **argv){
 	
 	Config::config = Config::loadConfig();
+
 //need a session ID
-	TransmissionRC::authenticate();
+	if(!TransmissionRC::authenticate()){
+		std::cout<<"authentication failed\r\n";
+		return 0;
+	}
+	
 
 	if(args<=1){
 //start UI

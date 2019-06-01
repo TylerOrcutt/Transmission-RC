@@ -4,8 +4,9 @@ using namespace TransmissionRC;
  static void btnClick(Gtk::Widget *widget){
 
 }
-ctrlTorrentToolBar::ctrlTorrentToolBar() : Gtk::Toolbar(){
+ctrlTorrentToolBar::ctrlTorrentToolBar(Gtk::ListBox * box) : Gtk::Toolbar(){
 
+	this->lstBox = box;
 //Open
 	btnOpen = new Gtk::ToolButton();
 	btnOpen->set_label("Open");
@@ -60,17 +61,32 @@ ctrlTorrentToolBar::ctrlTorrentToolBar() : Gtk::Toolbar(){
 }
 
 void ctrlTorrentToolBar::tbOpen_Clicked(){
-	std::cout<<"tbOpen clicked\r\n";
 }
 
+
 void ctrlTorrentToolBar::tbDelete_Clicked(){
-	std::cout<<"tbDelete clicked\r\n";
 }
 
 void ctrlTorrentToolBar::tbPause_Clicked(){
-	std::cout<<"tbPause clicked\r\n";
+
+	if(lstBox != NULL){
+		ctrlTorrentListItem * item = 
+				(ctrlTorrentListItem *)lstBox->get_selected_row();
+		if(item!=NULL){
+			stopTorrent(item->torrent.ID);
+		}
+	}
+
 }
 
 void ctrlTorrentToolBar::tbResume_Clicked(){
-	std::cout<<"tbResume clicked\r\n";
+
+	if(lstBox != NULL){
+		ctrlTorrentListItem * item = 
+				(ctrlTorrentListItem *)lstBox->get_selected_row();
+		if(item!=NULL){
+			resumeTorrent(item->torrent.ID);
+		}
+	}
+	
 }

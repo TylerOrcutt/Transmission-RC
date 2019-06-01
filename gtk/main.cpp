@@ -15,7 +15,9 @@ using namespace TransmissionRC;
 
 std::map<std::string,std::string>Config::config;
 std::string Config::sessionID="";
+
 Gtk::ListBox *lstbox;
+ctrlTorrentToolBar * torrentTB;
 
 std::mutex mtx;
 
@@ -39,7 +41,8 @@ static void updateThread(){
 
 			if(i>=lrows.size()){
 				
-				ctrlTorrentListItem * row = new  ctrlTorrentListItem((*torrents)[i]); 
+				ctrlTorrentListItem * row = 
+						new ctrlTorrentListItem((*torrents)[i]); 
 				lstbox->append(*row);
 				row->show();
 				continue;
@@ -104,9 +107,9 @@ int main (int args,char **argv){
 	window.add(*box);
 	box->show();
 
-	ctrlTorrentToolBar * tb = new ctrlTorrentToolBar();
-	box->add(*tb);
-	tb->show();
+	torrentTB = new ctrlTorrentToolBar(lstbox);
+	box->add(*torrentTB);
+	torrentTB->show();
 
 	Gtk::ScrolledWindow * sw = new Gtk::ScrolledWindow();
 	box->pack_start(*sw,true,true,0);

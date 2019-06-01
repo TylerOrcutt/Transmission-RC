@@ -4,16 +4,17 @@ using namespace TransmissionRC;
 
 
 bool TransmissionRC::authenticate(){
+
 	TransmissionRequest request = MakeRequest();
 	TransmissionResponse response = TransmissionRC::DoRequest(request);
 	
-	//if(response.sessionID != ""){
-
-	TransmissionRC::Config::sessionID = response.sessionID;	
-	  return true;
-	//}else{	
-	 //return false;
-	//}
+	if(response.statusCode == 200 || 
+			(response.sessionID !="" && response.statusCode==409)) { 
+		TransmissionRC::Config::sessionID = response.sessionID;	
+		return true;
+	}
+	
+	return false;
 }
 
 
@@ -78,13 +79,13 @@ std::vector<rcTorrent>*TransmissionRC::getTorrents(){
 bool TransmissionRC::resumeTorrent(int id){
 	
 	TransmissionRequest request = MakeRequest();
-	//request.sessionID = Config::sessionID;
+
 	std::stringstream req;
 	req<<"{ \"arguments\":{\"ids\":["<<id<<"]},\"method\":\"torrent-start\"}";
 	request.requestData =req.str();
 	TransmissionResponse response =	DoRequest(request);
 
-	if(response.statusCode =="200"){
+	if(response.statusCode == 200){
 		return true;
 	}
 	return false;
@@ -94,13 +95,13 @@ bool TransmissionRC::resumeTorrent(int id){
 bool TransmissionRC::stopTorrent(int id){
 	
 	TransmissionRequest request = MakeRequest();
-	//request.sessionID = Config::sessionID;
+
 	std::stringstream req;
 	req<<"{ \"arguments\":{\"ids\":["<<id<<"]},\"method\":\"torrent-stop\"}";
 	request.requestData =req.str();
 	TransmissionResponse response =	DoRequest(request);
 
-	if(response.statusCode =="200"){
+	if(response.statusCode == 200){
 		return true;
 	}
 	return false;
@@ -109,13 +110,13 @@ bool TransmissionRC::stopTorrent(int id){
 bool TransmissionRC::addTorrent(std::string URL){
 	
 	TransmissionRequest request = MakeRequest();
-	//request.sessionID = Config::sessionID;
+
 	request.requestData = "{ \"arguments\":{\"filename\":"
 				"\""+URL+"\"},\"method\":\"torrent-add\"}";
 	std::cout<<request.requestData<<std::endl<<std::endl;
 	TransmissionResponse response =	DoRequest(request);
 	std::cout<<response.response;
-	if(response.statusCode =="200"){
+	if(response.statusCode == 200){
 		return true;
 	}
 	return false;

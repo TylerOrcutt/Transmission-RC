@@ -49,7 +49,7 @@ TransmissionRC::TransmissionResponse & TransmissionRC::DoRequest(
 	TransmissionRC::TransmissionResponse *response = new TransmissionResponse();
 	response->response = readBuffer;
 	response->sessionID = headerBuffer["sessionID"];
-	response->statusCode = headerBuffer["status"];
+	response->statusCode = std::stoi(headerBuffer["status"]);
   return *response;
  }
 

@@ -9,7 +9,7 @@ namespace TransmissionRC{
 
  typedef struct{
 	std::string response;
-	std::string statusCode;
+	int statusCode;
 	std::string sessionID;
 
  }TransmissionResponse;
