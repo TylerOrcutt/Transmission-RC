@@ -5,6 +5,7 @@
 #include <thread>
 #include <mutex>
 #include "ctrlTorrentListItem.h"
+#include "ctrlTorrentToolBar.h"
 #include "../TransmissionRC.h"
 #include "../TransmissionRPCRequest.h"
 #include "../config.h"
@@ -58,7 +59,9 @@ static void updateThread(){
 	}
 }
 
-
+static void Btn1_Clicked(){
+	std::cout<<"btn clicked\r\n";
+}
 static void lstRowSelected(Gtk::ListBoxRow *row){
 	ctrlTorrentListItem *item = (ctrlTorrentListItem*) row;	
 	std::cout<<"Row Selected: "<<item->torrent.Name<<"\r\n";
@@ -101,6 +104,10 @@ int main (int args,char **argv){
 	window.add(*box);
 	box->show();
 
+	ctrlTorrentToolBar * tb = new ctrlTorrentToolBar();
+	box->add(*tb);
+	tb->show();
+
 	Gtk::ScrolledWindow * sw = new Gtk::ScrolledWindow();
 	box->pack_start(*sw,true,true,0);
 	sw->show();
@@ -112,6 +119,7 @@ int main (int args,char **argv){
 	Gtk::Button* btn1 = new Gtk::Button("Test");
 	box->add(*btn1);
 	btn1->show();
+	btn1->signal_clicked().connect(sigc::ptr_fun(&Btn1_Clicked));
 
 	std::thread t(updateThread);
 	t.detach();
