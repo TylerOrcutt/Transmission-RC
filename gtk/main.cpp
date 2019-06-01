@@ -14,54 +14,40 @@ using namespace TransmissionRC;
 
 std::map<std::string,std::string>Config::config;
 std::string Config::sessionID="";
-std::vector<ctrlTorrentListItem*> listRows;
+Gtk::ListBox *lstbox;
 
 std::mutex mtx;
-GtkWidget *lstBox;
-/*
+
 static void updateThread(){
 	while(true){
+
 		std::vector<rcTorrent> * torrents = getTorrents();		
+
 		if(torrents==NULL){
+
 			if(TransmissionRC::authenticate()){
 				torrents=getTorrents();
 			}
+
 		}	
 		mtx.lock();
-		for(int i=0;torrents!=NULL && i<torrents->size();i++){
-		   if(i>=listRows.size()){ 
-
-			ctrlTorrentListItem *rowItem = 
-				ctrlTorrentListItem::makeListItem((*torrents)[i]);
-			listRows.push_back(rowItem);		
-			gtk_list_box_insert(GTK_LIST_BOX(lstBox),rowItem->widget,-1);
-			
-			gtk_widget_show_all(lstBox);
-			continue;
-		   } 
 		
-			gtk_label_set_text(GTK_LABEL(listRows[i]->lblName),
-					   (*torrents)[i].Name.c_str());
-					   
-			std::stringstream ss;
-			ss<<c_trStatus[(*torrents)[i].Status];
+		std::vector<Gtk::Widget*> lrows = lstbox->get_children();
+		//need fix this
+		for(int i=0;i<torrents->size();i++){
 
-			if((*torrents)[i].Status>0){
-				ss<<" D:"<<Utility::convertTransferSpeed((*torrents)[i].rateDownload);
-				ss<<" U:"<<Utility::convertTransferSpeed((*torrents)[i].rateUpload);
+			if(i>=lrows.size()){
+				
+				ctrlTorrentListItem * row = new  ctrlTorrentListItem((*torrents)[i]); 
+				lstbox->append(*row);
+				row->show();
+				continue;
 			}
-			gtk_label_set_text(GTK_LABEL(listRows[i]->lblStatus),
-					   ss.str().c_str());
-
-			gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(listRows[i]->pbar),
-				      (*torrents)[i].percentDone);
-
-			ss.str(std::string());	
-			ss<<" downloaded "<<((*torrents)[i].totalSize*(*torrents)[i].percentDone/1024/1024)
-			  <<" mb";
-			gtk_label_set_text(GTK_LABEL(listRows[i]->lblDL),
-					   ss.str().c_str());
-		}	
+			
+			ctrlTorrentListItem *item = (ctrlTorrentListItem*)lrows[i];
+			item->update((*torrents)[i]);
+		
+		}
 		mtx.unlock();
 
 		if(torrents!=NULL){
@@ -72,165 +58,20 @@ static void updateThread(){
 	}
 }
 
-static void  tbItem_Clicked(GtkWidget *widget,gpointer data){
-	std::string t = "toolbar item: "  
-		""+std::string(
-		gtk_tool_button_get_label(GTK_TOOL_BUTTON(widget))) +""
-		 " clicked\r\n";
-	g_print(t.c_str());
 
-}
-
-static void btn1_Click(GtkWidget *widget, gpointer data){
-	if(((ctrlTorrentListItem*)listRows[0])->lblName ==NULL){
-		g_print("label NULL\r\n");
-	}
-	gtk_label_set_text(GTK_LABEL(((ctrlTorrentListItem*)listRows[0])->lblName),"test");
-}
-
-static void lstBox_rowSelect(GtkWidget *widget,GtkListBoxRow *row,gpointer *data){
-	g_print("row select changed \r\n");
-}
-
-
-static void activate (GtkApplication *app, gpointer user_data){
-
-	GtkWidget *window;
-	GtkWidget *stack;
-	GtkWidget *toolbar;
-	GtkWidget *button;	
-//style
-	const char *data = "progress,trough{border-radius:5px;"
-			   "border:1px solid grey;"
-			   //"background-color:green;"
-			   "min-height:20px;}"
-			   "separator#rsep{min-height:3px; background-color:black;}"
-			   "box{background-color:#262626; border-radius:5px;}"
-			   "box#bxrow{padding:5px;background-color:#262626;"
-				" border-radius:5px;}"
-			   "label#rlbl{color:white;}"
-			   "label#rlblTitle{color:white;font-size:16px; font-weight:bold;}"
-			   "list{background-color:#0d0d0d}";
-	GtkCssProvider * provider = gtk_css_provider_new();
-	if(!gtk_css_provider_load_from_data(provider,data,std::strlen(data),NULL)){
-		g_print("css load failed\r\n");
-	}
-	gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
-					GTK_STYLE_PROVIDER(provider),
-					GTK_STYLE_PROVIDER_PRIORITY_USER);
-
-	//window
-	window = gtk_application_window_new(app);
-	gtk_window_set_title(GTK_WINDOW(window),"Transmission-RC");
-	gtk_window_set_default_size(GTK_WINDOW(window),200,200);
-
-	//baselayout
-	stack = gtk_box_new(GTK_ORIENTATION_VERTICAL,0);
-	gtk_container_add(GTK_CONTAINER(window),stack);
-
-	//toolbar
-	toolbar=gtk_toolbar_new();
-	gtk_toolbar_set_style(GTK_TOOLBAR(toolbar),GTK_TOOLBAR_BOTH);
-	//gtk_container_add(GTK_CONTAINER(stack),toolbar);
-
-//toolbar items
-	//open
-	GtkToolItem * tb_openTorrent;
-	tb_openTorrent = gtk_tool_button_new(NULL,"Open");
-	g_signal_connect(tb_openTorrent,"clicked",
-			G_CALLBACK(tbItem_Clicked),NULL);
-
-	//cancel
-	GtkToolItem * tb_cancelTorrent;
-	tb_cancelTorrent = gtk_tool_button_new(NULL,"Delete");
-	g_signal_connect(tb_cancelTorrent,"clicked",
-			G_CALLBACK(tbItem_Clicked),NULL);	
-
-	//resume
-	GtkToolItem * tb_resumeTorrent;
-	tb_resumeTorrent = gtk_tool_button_new(NULL,"Resume");
-	g_signal_connect(tb_resumeTorrent,"clicked",
-			G_CALLBACK(tbItem_Clicked),NULL);
-	//disable resume for now	
-	gtk_widget_set_sensitive(GTK_WIDGET(tb_resumeTorrent),false);
-
-
-	//pause
-	GtkToolItem * tb_pauseTorrent;
-	tb_pauseTorrent = gtk_tool_button_new(NULL,"Pause");	
-	g_signal_connect(tb_pauseTorrent,"clicked",
-			G_CALLBACK(tbItem_Clicked),NULL);
-	gtk_widget_set_sensitive(GTK_WIDGET(tb_pauseTorrent),false);
-
-
-	//add items 	
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar),tb_openTorrent,-1);
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar),tb_cancelTorrent,-1);
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar),
-				gtk_separator_tool_item_new(),-1);
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar),tb_resumeTorrent,-1);
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar),tb_pauseTorrent,-1);
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar),
-				gtk_separator_tool_item_new(),-1);
-
-	
-	
-	//listbox
-	GtkWidget *scrolledWindow;
-	scrolledWindow = gtk_scrolled_window_new(NULL,NULL);
-
-	lstBox = gtk_list_box_new();
-	g_signal_connect(GTK_LIST_BOX(lstBox),"row-selected",G_CALLBACK(lstBox_rowSelect),NULL);	
-	gtk_container_add(GTK_CONTAINER(scrolledWindow),lstBox);		
-	
-	std::vector<rcTorrent> *torrents = getTorrents();
-	for(int i=0;i<torrents->size();i++){
-		ctrlTorrentListItem * rowItem = 
-				ctrlTorrentListItem::makeListItem((*torrents)[i]);
-		listRows.push_back(rowItem);		
-	 	gtk_list_box_insert(GTK_LIST_BOX(lstBox),GTK_WIDGET(rowItem),-1);
-	}
-	free(torrents);	
-
-	//test button
-	button = gtk_button_new_with_label("test");
-	//gtk_container_add(GTK_CONTAINER(stack),button);
-	g_signal_connect(button,"clicked",G_CALLBACK(btn1_Click),NULL);
-
-	gtk_box_pack_start(GTK_BOX(stack),toolbar,false,false,0);	
-	gtk_box_pack_start(GTK_BOX(stack),scrolledWindow,true,true,0);	
-	gtk_box_pack_start(GTK_BOX(stack),button,false,false,0);	
-
-	gtk_widget_show_all(window);
-*/
-
-	
-	//std::thread t(updateThread);
-	//t.detach();
-
-//}
-static void lstRowSelected(Gtk::ListBoxRow  *row){
-	ctrlTorrentListItem *item = (ctrlTorrentListItem*)row;	
-	std::string op = "selected row " + std::string(item->lblName->get_text()) + "\r\n";
-	g_print(op.c_str());
-
+static void lstRowSelected(Gtk::ListBoxRow *row){
+	ctrlTorrentListItem *item = (ctrlTorrentListItem*) row;	
+	std::cout<<"Row Selected: "<<item->torrent.Name<<"\r\n";
 }
 
 int main (int args,char **argv){
+
 	Config::config = Config::loadConfig();
 	TransmissionRC::authenticate();
-/*	
-	GtkApplication *app;
-	int status;
-	
-	app=gtk_application_new("org.trc",G_APPLICATION_FLAGS_NONE);
-	g_signal_connect(app,"activate", G_CALLBACK(activate),NULL);
-	status = g_application_run (G_APPLICATION(app),args,argv);
-	g_object_unref(app);
-*/
-auto app = Gtk::Application::create(args,argv,"org.trc");
-Gtk::Window window;
-window.set_default_size(200,200);
+
+	auto app = Gtk::Application::create(args,argv,"org.trc");
+	Gtk::Window window;
+	window.set_default_size(200,200);
 
 	const char *style = "progress,trough{border-radius:5px;"
 			   "border:1px solid grey;"
@@ -243,46 +84,37 @@ window.set_default_size(200,200);
 			   "label#rlbl{color:white;}"
 			   "label#rlblTitle{color:white;font-size:16px; font-weight:bold;}"
 			   "list{background-color:#0d0d0d}";
+
 	GtkCssProvider * provider = gtk_css_provider_new();
+
 	if(!gtk_css_provider_load_from_data(provider,style,std::strlen(style),NULL)){
 		g_print("css load failed\r\n");
 	}
+
 	gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
 					GTK_STYLE_PROVIDER(provider),
 					GTK_STYLE_PROVIDER_PRIORITY_USER);
 
-Gtk::ListBox *lstbox = new Gtk::ListBox();
-Gtk::Box *box = new Gtk::Box(Gtk::ORIENTATION_VERTICAL);
-window.add(*box);
-box->show();
-//box->add(*lstbox);
-box->pack_start(*lstbox,true,true,0);
-lstbox->show();
-lstbox->signal_row_selected().connect(sigc::ptr_fun(&lstRowSelected));
-std::vector<rcTorrent>* torrents = getTorrents();
-for(int i=0;i<torrents->size();i++){
-//ctrlTorrentListItem row;
-//lstbox.add(row);
-//row.show();
-	ctrlTorrentListItem * row = ctrlTorrentListItem::makeListItem((*torrents)[i]); 
-//	Gtk::ListBoxRow * row = new Gtk::ListBoxRow();
-//	Gtk::Box * box = new Gtk::Box();
-//	row->add(*box);
-//	box->show();
-//	Gtk::Label *lbl = new Gtk::Label("test");
-//	box->add(*lbl);
-//	lbl->show();
+	lstbox = new Gtk::ListBox();
+	Gtk::Box *box = new Gtk::Box(Gtk::ORIENTATION_VERTICAL);
+	
+	window.add(*box);
+	box->show();
 
-	lstbox->append(*row);
-	row->show();
-}
+	Gtk::ScrolledWindow * sw = new Gtk::ScrolledWindow();
+	box->pack_start(*sw,true,true,0);
+	sw->show();
+	sw->add(*lstbox);
 
+	lstbox->show();
+	lstbox->signal_row_selected().connect(sigc::ptr_fun(&lstRowSelected));
 
-Gtk::Button* btn1 = new Gtk::Button("Test");
-box->add(*btn1);
-btn1->show();
+	Gtk::Button* btn1 = new Gtk::Button("Test");
+	box->add(*btn1);
+	btn1->show();
 
-app->run(window);
-return 0 ;
+	std::thread t(updateThread);
+	t.detach();
 
+	return app->run(window);
 }

@@ -1,69 +1,74 @@
 #include "ctrlTorrentListItem.h"
 
 using namespace TransmissionRC;
- 
-TransmissionRC::ctrlTorrentListItem     *TransmissionRC::ctrlTorrentListItem::makeListItem 
-										(rcTorrent torrent){
-	ctrlTorrentListItem  *item = new ctrlTorrentListItem();
-	Gtk::Box * box = new Gtk::Box();
-	
-	item->add(*box);
+
+ctrlTorrentListItem::ctrlTorrentListItem(rcTorrent torrent):Gtk::ListBoxRow(){
+	Gtk::Box * box = new Gtk::Box(Gtk::ORIENTATION_VERTICAL,10);
+	add(*box);
 	box->show();
 
-	item->lblName = new  Gtk::Label(torrent.Name.c_str());
-	item->lblName->set_name("rlblTitle");
-	box->add(*(item->lblName));
-	item->lblName->show();
+//name label
+	lblName = new  Gtk::Label(torrent.Name.c_str(),Gtk::ALIGN_START,Gtk::ALIGN_START);
+	lblName->set_name("rlblTitle");
+	box->add(*(lblName));
+	lblName->show();
 
-	//GtkWidget *row;
-	//row = gtk_list_box_row_new();
-	return item;	
-/*
-	GtkWidget *wrapper = gtk_box_new(GTK_ORIENTATION_VERTICAL,10);
-	gtk_widget_set_name(wrapper,"bxrow");
-
-	item->lblName  = (GtkLabel*)gtk_label_new(torrent.Name.c_str());
-	gtk_widget_set_name(GTK_WIDGET(item->lblName),"rlblTitle");
-	gtk_label_set_xalign(item->lblName,0);
-	gtk_box_pack_start(GTK_BOX(wrapper),GTK_WIDGET(item->lblName),false,false,0);
+//status label
 
 	std::stringstream ss;
 	ss<<c_trStatus[torrent.Status];
-
+	
 	if(torrent.Status>0){
+
 		ss<<" D:"<<Utility::convertTransferSpeed(torrent.rateDownload);
 		ss<<" U:"<<Utility::convertTransferSpeed(torrent.rateUpload);
-	}
-	item->lblStatus = gtk_label_new(ss.str().c_str());
-	gtk_widget_set_name(item->lblStatus,"rlbl");
-	gtk_label_set_xalign(GTK_LABEL(item->lblStatus),0);
-	gtk_box_pack_start(GTK_BOX(wrapper),item->lblStatus,false,false,0);
+	}	
+
+	lblStatus = new Gtk::Label(ss.str().c_str(),Gtk::ALIGN_START,Gtk::ALIGN_START);
+	lblStatus->set_name("rlbl");
+	box->add(*lblStatus);
+	lblStatus->show();
+
+//progress bar
+	pbar = new Gtk::ProgressBar();
+	pbar->set_fraction(torrent.percentDone);
+	box->add(*pbar);
+	pbar->show();
 
 	
-	item->pbar = gtk_progress_bar_new();
-	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(item->pbar),
-				      torrent.percentDone);
+//download rate label	
+	ss.str(std::string());
+	ss<<" Downloaded "<<(torrent.totalSize*torrent.percentDone)/1024/1024
+	  <<" MB";
+	lblDL = new Gtk::Label(ss.str().c_str(),Gtk::ALIGN_START,Gtk::ALIGN_START);
+	lblDL->set_name("rlbl");
+	box->add(*lblDL);
+	lblDL->show();	
 	
-	gtk_box_pack_start(GTK_BOX(wrapper),item->pbar,false,false,0);
+
+	this->torrent =torrent;
+}
+
+void ctrlTorrentListItem::update(rcTorrent torrent){
+
+	this->torrent = torrent;
+	lblName->set_label(torrent.Name);
+
+	std::stringstream ss;
+	ss<<c_trStatus[torrent.Status];
+	
+	if(torrent.Status>0){
+
+		ss<<" D:"<<Utility::convertTransferSpeed(torrent.rateDownload);
+		ss<<" U:"<<Utility::convertTransferSpeed(torrent.rateUpload);
+	}	
+	lblStatus->set_label(ss.str().c_str());
 
 
-	ss.str(std::string());	
-	ss<<" downloaded "<<(torrent.totalSize*torrent.percentDone/1024/1024)
-	<<" mb";
-	item->lblDL = gtk_label_new(ss.str().c_str());
-	gtk_widget_set_name(item->lblDL,"rlbl");
-	gtk_label_set_xalign(GTK_LABEL(item->lblDL),0);
-	gtk_box_pack_start(GTK_BOX(wrapper),item->lblDL,false,false,0);
-	
-	
-	GtkWidget *separator = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
-	gtk_widget_set_name(separator,"rsep");
-	//gtk_box_pack_start(GTK_BOX(wrapper),
-	//		   separator,false,false,0);
-	gtk_container_add(GTK_CONTAINER(item),wrapper);
-	
-	//item->widget=row;	
+	ss.str(std::string());
+	ss<<" Downloaded "<<(torrent.totalSize*torrent.percentDone)/1024/1024
+	  <<" MB";
+	lblDL->set_label(ss.str().c_str());
 
-	return item;
-*/
+	pbar->set_fraction(torrent.percentDone);
 }

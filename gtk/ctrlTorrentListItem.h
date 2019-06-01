@@ -10,21 +10,19 @@ namespace TransmissionRC{
 
 	class ctrlTorrentListItem:public Gtk::ListBoxRow{
 		public:
-		ctrlTorrentListItem():Gtk::ListBoxRow(){
-
-		}
 		Gtk::Label * lblName;
-	//	TransmissionRC::rcTorrent torrent;
-	//	GtkLabel  *lblName;
-	//	GtkWidget *lblStatus;
-	//	GtkWidget *pbar;
-	//	GtkWidget *lblDL;
-	//	GtkWidget * widget;
-		static  ctrlTorrentListItem    *makeListItem(rcTorrent);
+		Gtk::Label * lblStatus;
+		Gtk::ProgressBar * pbar;
+		Gtk::Label * lblDL;
+		TransmissionRC::rcTorrent torrent;
+
+		ctrlTorrentListItem(rcTorrent torrent) ;
+		void update(rcTorrent torrent);
+		
 
 	};
 
 
 
 
-};
+}
