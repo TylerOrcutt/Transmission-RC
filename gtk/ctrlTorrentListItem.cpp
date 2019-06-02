@@ -4,6 +4,7 @@ using namespace TransmissionRC;
 
 ctrlTorrentListItem::ctrlTorrentListItem(rcTorrent torrent):Gtk::ListBoxRow(){
 	Gtk::Box * box = new Gtk::Box(Gtk::ORIENTATION_VERTICAL,10);
+	box->set_name("bxrow");
 	add(*box);
 	box->show();
 
@@ -16,7 +17,7 @@ ctrlTorrentListItem::ctrlTorrentListItem(rcTorrent torrent):Gtk::ListBoxRow(){
 //status label
 
 	std::stringstream ss;
-	ss<<c_trStatus[torrent.Status];
+	ss<<"["<<c_trStatus[torrent.Status]<<"]";
 	
 	if(torrent.Status>0){
 
@@ -34,8 +35,8 @@ ctrlTorrentListItem::ctrlTorrentListItem(rcTorrent torrent):Gtk::ListBoxRow(){
 	pbar->set_fraction(torrent.percentDone);
 	box->add(*pbar);
 	pbar->show();
+	pbar->set_text("test");
 
-	
 //download rate label	
 	ss.str(std::string());
 	ss<<" Downloaded "<<(torrent.totalSize*torrent.percentDone)/1024/1024
@@ -55,7 +56,7 @@ void ctrlTorrentListItem::update(rcTorrent torrent){
 	lblName->set_label(torrent.Name);
 
 	std::stringstream ss;
-	ss<<c_trStatus[torrent.Status];
+	ss<<"["<<c_trStatus[torrent.Status]<<"]";
 	
 	if(torrent.Status>0){
 

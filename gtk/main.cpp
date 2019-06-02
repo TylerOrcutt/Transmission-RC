@@ -6,6 +6,7 @@
 #include <mutex>
 #include "ctrlTorrentListItem.h"
 #include "ctrlTorrentToolBar.h"
+#include "ctrlTorrentStatusBar.h"
 #include "../TransmissionRC.h"
 #include "../TransmissionRPCRequest.h"
 #include "../config.h"
@@ -83,13 +84,22 @@ int main (int args,char **argv){
 			   "border:1px solid grey;"
 			   //"background-color:green;"
 			   "min-height:20px;}"
-			   "separator#rsep{min-height:3px; background-color:black;}"
-			   "box{background-color:#262626; border-radius:5px;}"
-			   "box#bxrow{padding:5px;background-color:#262626;"
-				" border-radius:5px;}"
+			   "toolbar>separator{min-height:3px; background-color:white;}"
+			   "toolbar * {margin:3px;}"
+			   //"box{background-color:#262626; border-radius:
+			   //"box#bxrow{padding:15px;background-color:#262626;"
+				//" border-radius:5px;}"
 			   "label#rlbl{color:white;}"
-			   "label#rlblTitle{color:white;font-size:16px; font-weight:bold;}"
-			   "list{background-color:#0d0d0d}";
+			   "label#rlblTitle{color:white;font-size:18px; font-weight:bold;}"
+			   "list{background-color:#0d0d0d}"
+			   "button{color:#fff; background-color:#262626}"
+			   "button:hover{color:#fff; background-color:blue}"
+			   "list>row:selected{color:#fff; background-color:blue}"
+			   "list>row{margin:3px;padding:10px;background-color:#262626;"
+				" border-radius:5px;}"
+			   "toolbar{background-color:#1a1a1a; border:2px solid #0f0f0f; padding:4px;}"
+			   "statusbar>label{color:red;}"
+			   "progressbar{color:#fff; }";
 
 	GtkCssProvider * provider = gtk_css_provider_new();
 
@@ -119,11 +129,15 @@ int main (int args,char **argv){
 	lstbox->show();
 	lstbox->signal_row_selected().connect(sigc::ptr_fun(&lstRowSelected));
 
-	Gtk::Button* btn1 = new Gtk::Button("Test");
+	ctrlTorrentStatusBar * bar = new ctrlTorrentStatusBar();
+	box->add(*bar);
+	bar->show();
+	
+/*	Gtk::Button* btn1 = new Gtk::Button("Test");
 	box->add(*btn1);
 	btn1->show();
 	btn1->signal_clicked().connect(sigc::ptr_fun(&Btn1_Clicked));
-
+*/
 	std::thread t(updateThread);
 	t.detach();
 

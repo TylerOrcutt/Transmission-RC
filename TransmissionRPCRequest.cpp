@@ -59,7 +59,7 @@ std::vector<rcTorrent>*TransmissionRC::getTorrents(){
 
 		if(torrent.Status==TransmissionRC::TR_STATUS_SEED
 		  && Config::config["stopSeeding"]=="true"){
-			TransmissionRC::stopTorrent(torrent.ID);	
+			//TransmissionRC::stopTorrent(torrent.ID);	
 		}
 
 	    }

@@ -59,6 +59,7 @@ void handleArgs(int args,char ** argv){
 					 <<" "<<(*torrents)[t].percentDone
 					 <<std::endl;
 			}
+			 if(torrents!=NULL){ free(torrents);}
 			i--;
 		}
 	

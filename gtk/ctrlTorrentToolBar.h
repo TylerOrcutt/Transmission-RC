@@ -6,6 +6,10 @@
 #include "ctrlTorrentListItem.h"
 #include "../TransmissionRPCRequest.h"
 
+#include "images/delete.xpm"
+#include "images/pause.xpm"
+#include "images/resume.xpm"
+
 namespace TransmissionRC{
 
 	class ctrlTorrentToolBar : public Gtk::Toolbar{
@@ -16,6 +20,7 @@ namespace TransmissionRC{
 			Gtk::ToolButton * btnPause;
 			Gtk::ToolButton * btnResume;
 			
+		  	Gtk::Image *imgPause;			
 			Gtk::ListBox * lstBox;
 		public:
 			ctrlTorrentToolBar(Gtk::ListBox *);	
