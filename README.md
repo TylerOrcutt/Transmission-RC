@@ -24,9 +24,9 @@ Dependencies:<br />
 Arguments<br />
 -t   outputs a list of torrents with the id, name, size, status, percent done
 <br/>
--r <torrentID> - resume torrent
+-r \<torrentID\>- resume torrent
  <br />
--s <torrentID> - stop torrent
+-s \<torrentID\> - stop torrent
 <br />
 -add URL/magnet link - adds a torrent
 <br />
