@@ -7,6 +7,7 @@ Dependencies:
 <br />
 -curl
 <br />
+-boost<br />
 -ncursers
 <br />
 <br />
@@ -17,10 +18,18 @@ GTK UI<br />
 <br />
 Dependencies:<br />
 -curl<br />
+-boost<br />
 -GTK/GTKMM<br />
 <br />
+<br />  
+Config example: ~/.config/trc.conf<br />
+ username=transmission<br />
+ password=rpc<br />
+ host=192.169.1.11<br />
+ port=9091<br />
+
 <br />
-  
+<br />  
 Arguments<br />
 -t   outputs a list of torrents with the id, name, size, status, percent done
 <br/>
@@ -31,4 +40,4 @@ Arguments<br />
 -add URL/magnet link - adds a torrent
 <br />
 url/magnet link -add a torrents 
- <br />
+  
