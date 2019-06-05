@@ -81,6 +81,15 @@ void handleArgs(int args,char ** argv){
 
 			}
 		}
+
+		if(std::string(argv[i])=="-blocklist-update"){
+			if(TransmissionRC::updateBlockList()){
+				std::cout<<"Updated success\r\n";
+			}else{
+				std::cout<<"Updated failed\r\n";
+			}
+			return;
+		}
 	}
 	if(args==2 && std::strlen(argv[1])>2){
 		TransmissionRC::addTorrent(std::string(argv[1]));	

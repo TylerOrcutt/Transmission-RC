@@ -8,12 +8,20 @@
 namespace TransmissionRC{
 
 
-bool authenticate();
-std::vector<TransmissionRC::rcTorrent> * getTorrents();
-bool resumeTorrent(int id);
-bool stopTorrent(int id);
-bool addTorrent(std::string);
-bool addTorrent(unsigned long,char **);
+	bool authenticate();
+	std::vector<TransmissionRC::rcTorrent> * getTorrents();
 
+	bool resumeTorrent(int id);
+	bool resumeTorrent(int **id);
+
+	bool stopTorrent(int id);
+	bool stopTorrent(int **id);
+
+	bool addTorrent(std::string);
+
+	bool removeTorrent(int id);
+	bool removeTorrent(int **id);
+
+	bool updateBlockList();
 
 }

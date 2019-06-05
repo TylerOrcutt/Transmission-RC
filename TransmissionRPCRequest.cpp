@@ -115,9 +115,46 @@ bool TransmissionRC::addTorrent(std::string URL){
 				"\""+URL+"\"},\"method\":\"torrent-add\"}";
 	std::cout<<request.requestData<<std::endl<<std::endl;
 	TransmissionResponse response =	DoRequest(request);
-	std::cout<<response.response;
+	//std::cout<<response.response;
+
 	if(response.statusCode == 200){
 		return true;
 	}
 	return false;
+}
+
+
+bool TransmissionRC::removeTorrent(int id){
+	
+	TransmissionRequest request = MakeRequest();
+		
+	std::stringstream req;
+	req<<"{ \"arguments\":{\"ids\":["<<id<<"]},\"method\":\"torrent-remove\"}";
+	request.requestData =req.str();
+
+	TransmissionResponse response =	DoRequest(request);
+
+	if(response.statusCode == 200){
+		return true;
+	}
+	return false;
+}
+
+
+
+bool TransmissionRC::updateBlockList(){
+
+	TransmissionRequest request = MakeRequest();
+
+	request.requestData = "{\"method\":\"blocklist-update\"}";
+	std::cout<<request.requestData<<std::endl<<std::endl;
+	TransmissionResponse response =	DoRequest(request);
+
+	//std::cout<<response.response;
+
+	if(response.statusCode == 200){
+		return true;
+	}
+	return false;
+
 }

@@ -20,17 +20,22 @@ void TransmissionRC::updateThread(){
 	while(running){
 	mtx.lock();
 
-	if(torrents!=NULL){
-		free(torrents);
-		torrents=NULL;
-	}
 
-	torrents = TransmissionRC::getTorrents();
+	std::vector<rcTorrent> *tt = TransmissionRC::getTorrents();
 
-	if(torrents==NULL){
+	if(tt==NULL){
 		if(TransmissionRC::authenticate()){
   			torrents = TransmissionRC::getTorrents();
+		}else{
+			statusMsg = "authentication failed.";	
 		}
+	}else{
+
+		if(torrents!=NULL){
+			free(torrents);
+			torrents=NULL;
+		}
+		torrents=tt;
 	}
 
 	mtx.unlock();
@@ -48,6 +53,7 @@ void TransmissionRC::runUI(){
 	noecho();
 	curs_set(0);
 	start_color();
+
 	getmaxyx(stdscr,screenmx,screenmy);
 	//nodelay(stdscr,true);
 	init_pair(1,COLOR_WHITE,COLOR_BLACK);
@@ -58,6 +64,8 @@ void TransmissionRC::runUI(){
 	clear();
 
 	torwin.win = newwin(torwin.winH,torwin.winW,0,0);
+	keypad(stdscr,true);
+	keypad(torwin.win,true);
 				
 	//wbkgd(addTorwin.win,COLOR_PAIR(2));		
 	refresh();
@@ -82,19 +90,25 @@ void TransmissionRC::runUI(){
 void TransmissionRC::getKeyPress(){
 
 	int ch = getch();
+	int tid = torwin.my/4 + torwin.offset;
 
 	switch (ch){
-	case 'j':
+
+	case 'j' :
+	case KEY_DOWN : 
 		if(torwin.my/4>=torwin.winH/4-1 
 		   && torrents!=NULL
 		   && torwin.my/4 + torwin.offset<torrents->size()-1){
 
 			torwin.offset++;
-		}else if(torwin.my/4<=torwin.winH/4 - 2){
+		}else if(torwin.my/4<=torwin.winH/4 - 2
+			 && torwin.my/4< torrents->size()-1 ){
 			torwin.my+=4;
 		}
 	break;
+
 	case 'k':
+	case KEY_UP:
 
 		if(torwin.my<=0&&torwin.offset>0){
 
@@ -104,24 +118,31 @@ void TransmissionRC::getKeyPress(){
 			torwin.my-=4;
 		}
 	break;
+
 	case 'q':
 		running=false;
 	break;
+
 	case 'd': 
-		if( pchar=='d'){
-		  statusMsg="Delete ?";
-		  int id = torwin.my/4 + torwin.offset;
-			std::stringstream ss;
-		   ss<<"Delete "<<(*torrents)[id].Name
-		     << "?";
-		   statusMsg = ss.str();
-		  pchar=0;
-		  return;
+		if(torrents != NULL && tid<torrents->size()){
+			statusMsg="Delete "+ (*torrents)[tid].Name+ "?(y/n)";
+		}else{
+			//stop from setting pchar
+		return;
 		}
 
 	break;
+
+	case 'y': 
+		if( pchar=='d'){
+			statusMsg="Deleting "+ (*torrents)[tid].Name +".";
+			pchar=0;
+			TransmissionRC::removeTorrent((*torrents)[tid].ID);
+			return;
+		}
+	break;
 	case ':':
-	isInserting = true;
+		isInserting = true;
 	break;
 	//start stop
 	case 's':
@@ -143,6 +164,7 @@ void TransmissionRC::getKeyPress(){
 
 		statusMsg = ss.str();
 	break;
+
 	}
 	pchar=ch; 
 }
@@ -210,10 +232,6 @@ void TransmissionRC::drawScreen(){
 //draw status msg;
 	mvwprintw(torwin.win,torwin.winH-1,0,statusMsg.c_str());
 	
-	//werase(addTorwin.win);
-	//box(addTorwin.win,0,0);
 	wrefresh(stdscr);
 	wrefresh(torwin.win);
-	//wrefresh(addTorwin.win);
-	//mvwprintw(addTorwin.win,10,10,"test");
 }
