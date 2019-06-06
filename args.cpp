@@ -21,7 +21,7 @@ void TransmissionRC::i3Status(){
 			break;
 			case 5:
 			case 6:
-				paused++;
+				seeding++;
 			break;
 		}
 	}
