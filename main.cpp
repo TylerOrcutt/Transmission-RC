@@ -7,7 +7,7 @@
 #include "TransmissionRC.h"
 #include "TransmissionRPCRequest.h"
 #include "config.h"
-
+#include "args.h"
 #include "termInterface.h"
 
 
@@ -64,7 +64,7 @@ void handleArgs(int args,char ** argv){
 		}
 	
 		if(std::string(argv[i]) == "-i3-t"){
-			std::cout<<"Test";
+			i3Status();
 			return;
 		}
 		

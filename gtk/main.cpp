@@ -11,7 +11,7 @@
 #include "../TransmissionRPCRequest.h"
 #include "../config.h"
 #include "../Utility.h"
-
+#include "../args.h"
 using namespace TransmissionRC;
 
 std::map<std::string,std::string>Config::config;
@@ -69,7 +69,7 @@ static void Btn1_Clicked(){
 }
 static void lstRowSelected(Gtk::ListBoxRow *row){
 	ctrlTorrentListItem *item = (ctrlTorrentListItem*) row;	
-	std::cout<<"Row Selected: "<<item->torrent.Name<<"\r\n";
+	//std::cout<<"Row Selected: "<<item->torrent.Name<<"\r\n";
 }
 
 void loadCSS(){
@@ -113,6 +113,7 @@ int main (int args,char **argv){
 
 	if(args>1){
 		showTorrentPopup(args,argv);	
+		return 0;
 	}
 
 	auto app = Gtk::Application::create(args,argv,"org.trc");
@@ -156,13 +157,14 @@ int main (int args,char **argv){
 }
 
 
+	Gtk::Dialog *dia;
 //i3 status bar popup ?? 
 void showTorrentPopup(int args,char ** argv){
 
 	Gtk::Main gtkw(args,argv);
-	Gtk::Dialog dia;
 	loadCSS();
-	dia.set_default_size(340,400);
+	dia = new Gtk::Dialog();
+	dia->set_default_size(340,400);
 
 	auto dsp = Gdk::Display::get_default();
 	auto scrn = dsp->get_default_screen();
@@ -174,14 +176,14 @@ void showTorrentPopup(int args,char ** argv){
 	int x,y;
 	grb->get_position(x,y);
 
-
-	dia.move(x-340/2,y+20);
-	dia.show();
+//TODO: what if this needs to pop up from the bottom?
+	dia->move(x-340/2,y+20);
+	dia->show();
 	
 	lstbox = new Gtk::ListBox();
 	Gtk::Box *box = new Gtk::Box(Gtk::ORIENTATION_VERTICAL);
 	
-	dia.get_vbox()->pack_start(*box,true,true,0);
+	dia->get_vbox()->pack_start(*box,true,true,0);
 	box->show();
 
 
@@ -197,5 +199,10 @@ void showTorrentPopup(int args,char ** argv){
 	std::thread t(updateThread);
 	t.detach();
 
-	dia.run();
+	dia->signal_focus_out_event().connect([](GdkEventFocus *ev ){
+			dia->close();
+			i3Status();
+			return false;
+			});
+	dia->run();
 }
