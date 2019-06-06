@@ -20,6 +20,10 @@ Dependencies:<br />
 -curl<br />
 -boost<br />
 -GTK/GTKMM<br />
+
+GTK i3 Dropdown prototype<br />
+![alt text](https://github.com/TylerOrcutt/Transmission-RC/blob/master/screens/i3blocks_dropdown.png)
+
 <br />
 <br />  
 Config example: ~/.config/trc.conf<br />
