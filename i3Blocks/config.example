@@ -1,0 +1,8 @@
+separator_block_width=15
+markup=pango
+
+[transmissionRC]
+interval=30
+label=T:
+command=~/git/Transmission-RC/i3Blocks/transmissionRC
+
