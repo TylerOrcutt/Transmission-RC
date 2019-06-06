@@ -21,6 +21,7 @@ Gtk::ListBox *lstbox;
 ctrlTorrentToolBar * torrentTB;
 
 std::mutex mtx;
+void showTorrentPopup(int, char**);
 
 static void updateThread(){
 	while(true){
@@ -71,14 +72,7 @@ static void lstRowSelected(Gtk::ListBoxRow *row){
 	std::cout<<"Row Selected: "<<item->torrent.Name<<"\r\n";
 }
 
-int main (int args,char **argv){
-
-	Config::config = Config::loadConfig();
-	TransmissionRC::authenticate();
-
-	auto app = Gtk::Application::create(args,argv,"org.trc");
-	Gtk::Window window;
-	window.set_default_size(200,200);
+void loadCSS(){
 
 	const char *style = "progress,trough{border-radius:5px;"
 			   "border:1px solid grey;"
@@ -111,6 +105,22 @@ int main (int args,char **argv){
 					GTK_STYLE_PROVIDER(provider),
 					GTK_STYLE_PROVIDER_PRIORITY_USER);
 
+}
+int main (int args,char **argv){
+	Config::config = Config::loadConfig();
+	TransmissionRC::authenticate();
+
+
+	if(args>1){
+		showTorrentPopup(args,argv);	
+	}
+
+	auto app = Gtk::Application::create(args,argv,"org.trc");
+	Gtk::Window window;
+	window.set_default_size(200,200);
+
+	loadCSS();
+
 	lstbox = new Gtk::ListBox();
 	Gtk::Box *box = new Gtk::Box(Gtk::ORIENTATION_VERTICAL);
 	
@@ -142,4 +152,50 @@ int main (int args,char **argv){
 	t.detach();
 
 	return app->run(window);
+
+}
+
+
+//i3 status bar popup ?? 
+void showTorrentPopup(int args,char ** argv){
+
+	Gtk::Main gtkw(args,argv);
+	Gtk::Dialog dia;
+	loadCSS();
+	dia.set_default_size(340,400);
+
+	auto dsp = Gdk::Display::get_default();
+	auto scrn = dsp->get_default_screen();
+
+	auto grb = dsp->get_default_seat()->get_pointer();
+	if(!grb){
+		std::cout<<"grab failed";
+	}
+	int x,y;
+	grb->get_position(x,y);
+
+
+	dia.move(x-340/2,y+20);
+	dia.show();
+	
+	lstbox = new Gtk::ListBox();
+	Gtk::Box *box = new Gtk::Box(Gtk::ORIENTATION_VERTICAL);
+	
+	dia.get_vbox()->pack_start(*box,true,true,0);
+	box->show();
+
+
+	Gtk::ScrolledWindow * sw = new Gtk::ScrolledWindow();
+	box->pack_start(*sw,true,true,0);
+	sw->show();
+	sw->add(*lstbox);
+
+	lstbox->show();
+	lstbox->signal_row_selected().connect(sigc::ptr_fun(&lstRowSelected));
+
+	
+	std::thread t(updateThread);
+	t.detach();
+
+	dia.run();
 }

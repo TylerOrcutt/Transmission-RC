@@ -124,6 +124,7 @@ void TransmissionRC::getKeyPress(){
 	break;
 
 	case 'd': 
+
 		if(torrents != NULL && tid<torrents->size()){
 			statusMsg="Delete "+ (*torrents)[tid].Name+ "?(y/n)";
 		}else{
@@ -134,6 +135,7 @@ void TransmissionRC::getKeyPress(){
 	break;
 
 	case 'y': 
+
 		if( pchar=='d'){
 			statusMsg="Deleting "+ (*torrents)[tid].Name +".";
 			pchar=0;

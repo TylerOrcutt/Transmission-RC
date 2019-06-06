@@ -63,6 +63,10 @@ void handleArgs(int args,char ** argv){
 			i--;
 		}
 	
+		if(std::string(argv[i]) == "-i3-t"){
+			std::cout<<"Test";
+			return;
+		}
 		
 		if(std::string(argv[i]) == "-r"){
 			int id=0;	
