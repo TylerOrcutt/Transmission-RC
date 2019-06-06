@@ -38,7 +38,7 @@ static void updateThread(){
 		mtx.lock();
 		
 		std::vector<Gtk::Widget*> lrows = lstbox->get_children();
-		//need fix this
+		//need to make this less shitty
 		for(int i=0;i<torrents->size();i++){
 
 			if(i>=lrows.size()){
@@ -54,6 +54,13 @@ static void updateThread(){
 			item->update((*torrents)[i]);
 		
 		}
+		//remove excess rows
+		if(torrents!=NULL){
+			for(int i= torrents->size();i<lrows.size();i++){
+				lstbox->remove(*lrows[i]);	
+			}
+		}
+
 		mtx.unlock();
 
 		if(torrents!=NULL){
@@ -79,6 +86,10 @@ void loadCSS(){
 			   //"background-color:green;"
 			   "min-height:20px;}"
 			   "toolbar>separator{min-height:3px; background-color:white;}"
+			   "box{border-color:red; }"
+			   "window{background-color:rgba(0,0,0,0);}"
+			   //"#vbox{border:4px solid red; border-radius:0px 0px 9px 9px;"
+			      //"padding:0px; margin:0px;}"
 			   "toolbar * {margin:3px;}"
 			   //"box{background-color:#262626; border-radius:
 			   //"box#bxrow{padding:15px;background-color:#262626;"
@@ -164,7 +175,10 @@ void showTorrentPopup(int args,char ** argv){
 	Gtk::Main gtkw(args,argv);
 	loadCSS();
 	dia = new Gtk::Dialog();
-	dia->set_default_size(340,400);
+	int width = 350,height = 375;
+	dia->set_default_size(width,height);
+	dia->set_border_width(0);
+	dia->set_decorated(false);
 
 	auto dsp = Gdk::Display::get_default();
 	auto scrn = dsp->get_default_screen();
@@ -177,12 +191,14 @@ void showTorrentPopup(int args,char ** argv){
 	grb->get_position(x,y);
 
 //TODO: what if this needs to pop up from the bottom?
-	dia->move(x-340/2,y+20);
+	dia->move(x-width/2,y+20);
 	dia->show();
 	
 	lstbox = new Gtk::ListBox();
 	Gtk::Box *box = new Gtk::Box(Gtk::ORIENTATION_VERTICAL);
 	
+	dia->get_vbox()->set_border_width(0);
+	dia->get_vbox()->set_name("vbox");
 	dia->get_vbox()->pack_start(*box,true,true,0);
 	box->show();
 

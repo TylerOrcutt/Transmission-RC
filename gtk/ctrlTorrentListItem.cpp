@@ -11,6 +11,8 @@ ctrlTorrentListItem::ctrlTorrentListItem(rcTorrent torrent):Gtk::ListBoxRow(){
 //name label
 	lblName = new  Gtk::Label(torrent.Name.c_str(),Gtk::ALIGN_START,Gtk::ALIGN_START);
 	lblName->set_name("rlblTitle");
+	lblName->set_line_wrap(true);
+	lblName->set_line_wrap_mode(Pango::WRAP_CHAR);
 	box->add(*(lblName));
 	lblName->show();
 
