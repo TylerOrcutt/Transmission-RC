@@ -18,6 +18,7 @@ ctrlTorrentToolBar::ctrlTorrentToolBar(Gtk::ListBox * box) : Gtk::Toolbar(){
 //Delete
 	btnDelete = new Gtk::ToolButton();
 	btnDelete->set_label("Delete");
+	btnDelete->set_sensitive(false);
 	this->append(*btnDelete);
 	btnDelete->show();
 
@@ -34,6 +35,7 @@ ctrlTorrentToolBar::ctrlTorrentToolBar(Gtk::ListBox * box) : Gtk::Toolbar(){
 //Pause
 	btnPause= new Gtk::ToolButton();
 	btnPause->set_label("Pause");
+	btnPause->set_sensitive(false);
 	this->append(*btnPause);
 	btnPause->show();
 //Pause img
@@ -45,6 +47,7 @@ ctrlTorrentToolBar::ctrlTorrentToolBar(Gtk::ListBox * box) : Gtk::Toolbar(){
 //Resume
 	btnResume = new Gtk::ToolButton();
 	btnResume->set_label("Start");
+	btnResume->set_sensitive(false);
 	this->append(*btnResume);
 	btnResume->show();
 //Resume img

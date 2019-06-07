@@ -14,6 +14,7 @@ namespace TransmissionRC{
 
 	class ctrlTorrentToolBar : public Gtk::Toolbar{
 		private:
+		public:
 			Gtk::ToolButton * btnOpen;
 			Gtk::ToolButton * btnDelete;
 

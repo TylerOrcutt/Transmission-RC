@@ -22,7 +22,8 @@ ctrlTorrentToolBar * torrentTB;
 
 std::mutex mtx;
 void showTorrentPopup(int, char**);
-
+static void lstRowSelected(Gtk::ListBoxRow *);
+	
 static void updateThread(){
 	while(true){
 
@@ -60,7 +61,8 @@ static void updateThread(){
 				lstbox->remove(*lrows[i]);	
 			}
 		}
-
+		//refresh toolbar buttons
+		lstRowSelected(lstbox->get_selected_row());
 		mtx.unlock();
 
 		if(torrents!=NULL){
@@ -77,6 +79,24 @@ static void Btn1_Clicked(){
 static void lstRowSelected(Gtk::ListBoxRow *row){
 	ctrlTorrentListItem *item = (ctrlTorrentListItem*) row;	
 	//std::cout<<"Row Selected: "<<item->torrent.Name<<"\r\n";
+	if(torrentTB != NULL && item!=NULL){
+		switch(item->torrent.Status){
+			case 0:	
+			torrentTB->btnResume->set_sensitive(true);
+			torrentTB->btnPause->set_sensitive(false);
+			break;
+			case 1:	
+			case 2:	
+			case 3:	
+			case 4:	
+			case 5:	
+			case 6:	
+			torrentTB->btnResume->set_sensitive(false);
+			torrentTB->btnDelete->set_sensitive(true);
+			torrentTB->btnPause->set_sensitive(true);
+			break;
+		}
+	}
 }
 
 void loadCSS(){
@@ -95,7 +115,7 @@ void loadCSS(){
 			   //"box#bxrow{padding:15px;background-color:#262626;"
 				//" border-radius:5px;}"
 			   "label#rlbl{color:white;}"
-			   "label#rlblTitle{color:white;font-size:18px; font-weight:bold;}"
+			   "label#rlblTitle{color:white;font-size:16px; font-weight:bold;}"
 			   "list{background-color:#0d0d0d}"
 			   "button{color:#fff; background-color:#262626}"
 			   "button:hover{color:#fff; background-color:blue}"
