@@ -2,8 +2,8 @@
 
 
 case $BLOCK_BUTTON in
-	1) exec ~/git/Transmission-RC/gtk/TransmissionRC-gtk -a 
+	1) exec /usr/bin/transmission-rc-gtk -a 
 	   ;;
 esac
 
-exec ~/git/Transmission-RC/TransmissionRC -i3-t
+exec /usr/bin/transmission-rc -i3-t
