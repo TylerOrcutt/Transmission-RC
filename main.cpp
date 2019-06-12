@@ -24,7 +24,7 @@ int main(int args, char **argv){
 
 //need a session ID
 	if(!TransmissionRC::authenticate()){
-		std::cout<<"authentication failed\r\n";
+		std::cout<<"authentication failed";
 		return 0;
 	}
 	

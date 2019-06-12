@@ -4,6 +4,8 @@
 #include <vector>
 #include <thread>
 #include <mutex>
+#include "css.h"
+#include "winTorrentPopup.h"
 #include "ctrlTorrentListItem.h"
 #include "ctrlTorrentToolBar.h"
 #include "ctrlTorrentStatusBar.h"
@@ -17,14 +19,14 @@ using namespace TransmissionRC;
 std::map<std::string,std::string>Config::config;
 std::string Config::sessionID="";
 
-Gtk::ListBox *lstbox;
+//Gtk::ListBox *lstbox;
 ctrlTorrentToolBar * torrentTB;
 
 std::mutex mtx;
 void showTorrentPopup(int, char**);
 static void lstRowSelected(Gtk::ListBoxRow *);
 	
-static void updateThread(){
+static void updateThread(Gtk::ListBox *lstbox){
 	while(true){
 
 		std::vector<rcTorrent> * torrents = getTorrents();		
@@ -40,12 +42,13 @@ static void updateThread(){
 		
 		std::vector<Gtk::Widget*> lrows = lstbox->get_children();
 		//need to make this less shitty
-		for(int i=0;i<torrents->size();i++){
+		for(int i=0;torrents!=NULL && i<torrents->size();i++){
 
 			if(i>=lrows.size()){
 				
 				ctrlTorrentListItem * row = 
-						new ctrlTorrentListItem((*torrents)[i]); 
+						new ctrlTorrentListItem(
+								(*torrents)[i]); 
 				lstbox->append(*row);
 				row->show();
 				continue;
@@ -99,44 +102,6 @@ static void lstRowSelected(Gtk::ListBoxRow *row){
 	}
 }
 
-void loadCSS(){
-
-	const char *style = "progress,trough{border-radius:5px;"
-			   "border:1px solid grey;"
-			   //"background-color:green;"
-			   "min-height:20px;}"
-			   "toolbar>separator{min-height:3px; background-color:white;}"
-			   "box{border-color:red; }"
-			   "window{background-color:rgba(0,0,0,0);}"
-			   //"#vbox{border:4px solid red; border-radius:0px 0px 9px 9px;"
-			      //"padding:0px; margin:0px;}"
-			   "toolbar * {margin:3px;}"
-			   //"box{background-color:#262626; border-radius:
-			   //"box#bxrow{padding:15px;background-color:#262626;"
-				//" border-radius:5px;}"
-			   "label#rlbl{color:white;}"
-			   "label#rlblTitle{color:white;font-size:16px; font-weight:bold;}"
-			   "list{background-color:#0d0d0d}"
-			   "button{color:#fff; background-color:#262626}"
-			   "button:hover{color:#fff; background-color:blue}"
-			   "list>row:selected{color:#fff; background-color:blue}"
-			   "list>row{margin:3px;padding:10px;background-color:#262626;"
-				" border-radius:5px;}"
-			   "toolbar{background-color:#1a1a1a; border:2px solid #0f0f0f; padding:4px;}"
-			   "statusbar>label{color:red;}"
-			   "progressbar{color:#fff; }";
-
-	GtkCssProvider * provider = gtk_css_provider_new();
-
-	if(!gtk_css_provider_load_from_data(provider,style,std::strlen(style),NULL)){
-		g_print("css load failed\r\n");
-	}
-
-	gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
-					GTK_STYLE_PROVIDER(provider),
-					GTK_STYLE_PROVIDER_PRIORITY_USER);
-
-}
 int main (int args,char **argv){
 	Config::config = Config::loadConfig();
 	TransmissionRC::authenticate();
@@ -151,9 +116,9 @@ int main (int args,char **argv){
 	Gtk::Window window;
 	window.set_default_size(200,200);
 
-	loadCSS();
+	TransmissionRC::Style::loadCSS((char *)TransmissionRC::Style::style);
 
-	lstbox = new Gtk::ListBox();
+	Gtk::ListBox *lstbox = new Gtk::ListBox();
 	Gtk::Box *box = new Gtk::Box(Gtk::ORIENTATION_VERTICAL);
 	
 	window.add(*box);
@@ -180,7 +145,7 @@ int main (int args,char **argv){
 	btn1->show();
 	btn1->signal_clicked().connect(sigc::ptr_fun(&Btn1_Clicked));
 */
-	std::thread t(updateThread);
+	std::thread t(updateThread,lstbox);
 	t.detach();
 
 	return app->run(window);
@@ -188,13 +153,21 @@ int main (int args,char **argv){
 }
 
 
+//i3 status bar popup  
 	Gtk::Dialog *dia;
-//i3 status bar popup ?? 
 void showTorrentPopup(int args,char ** argv){
 
-	Gtk::Main gtkw(args,argv);
-	loadCSS();
-	dia = new Gtk::Dialog();
+	//Gtk::Main gtkw(args,argv);
+	int arc =1;
+	auto app = Gtk::Application::create(arc,argv,"org.trc.popup");
+
+	TransmissionRC::Style::loadCSS((char *)TransmissionRC::Style::style);
+	
+	winTorrentPopup *win = new winTorrentPopup(&updateThread);
+	app->run(*win);
+	//winTorrentPopup *popup = new winTorrentPopup();
+	//loadCSS();
+	/*dia = new Gtk::Dialog();
 	int width = 350,height = 375;
 	dia->set_default_size(width,height);
 	dia->set_border_width(0);
@@ -207,11 +180,13 @@ void showTorrentPopup(int args,char ** argv){
 	if(!grb){
 		std::cout<<"grab failed";
 	}
-	int x,y;
-	grb->get_position(x,y);
 
-//TODO: what if this needs to pop up from the bottom?
-	dia->move(x-width/2,y+20);
+	int x,y,yoffset = 20;
+
+	grb->get_position(x,y);
+	
+
+	dia->move(x-width/2,y+yoffset);
 	dia->show();
 	
 	lstbox = new Gtk::ListBox();
@@ -235,10 +210,23 @@ void showTorrentPopup(int args,char ** argv){
 	std::thread t(updateThread);
 	t.detach();
 
+
 	dia->signal_focus_out_event().connect([](GdkEventFocus *ev ){
 			dia->close();
 			i3Status();
 			return false;
 			});
 	dia->run();
+	
+	std::thread t(updateThread);
+	t.detach();
+
+
+	dia->signal_focus_out_event().connect([](GdkEventFocus *ev ){
+			dia->close();
+			i3Status();
+			return false;
+			});
+	dia->run();
+*/
 }
