@@ -18,9 +18,6 @@ all: $(PROGRAM)
 -include $(OBJS:%.o=$(DEPDIR)/%.Po)
 
 %.o: %.cpp
-	#@mkdir -p $(DEPDIR)
-	#$(CXX) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $(CXXFLAGS) $<
-	#@mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
 	$(CXX) -MT $@ -MD -MP -MF $*.o -c -o $@ $(CXXFLAGS) $<
 
 $(PROGRAM): $(OBJS)
