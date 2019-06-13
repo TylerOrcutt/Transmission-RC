@@ -28,7 +28,7 @@ static void lstRowSelected(Gtk::ListBoxRow *);
 	
 static void updateToolbar(int status);
 
-static void updateThread(std::shared_ptr<Gtk::ListBox> lstbox){
+static void updateThread(Gtk::ListBox *lstbox){
 
 	while(true){
 
@@ -42,7 +42,7 @@ static void updateThread(std::shared_ptr<Gtk::ListBox> lstbox){
 
 		}	
 		mtx.lock();	
-		std::vector<Gtk::Widget*> lrows = lstbox.get()->get_children();
+		std::vector<Gtk::Widget*> lrows = lstbox->get_children();
 		//need to make this less shitty
 		for(int i=0;torrents!=NULL && i<torrents->size();i++){
 
@@ -51,7 +51,7 @@ static void updateThread(std::shared_ptr<Gtk::ListBox> lstbox){
 				ctrlTorrentListItem * row = 
 						new ctrlTorrentListItem(
 								(*torrents)[i]); 
-				lstbox.get()->append(*row);
+				lstbox->append(*row);
 				row->show();
 				continue;
 			}
@@ -63,7 +63,7 @@ static void updateThread(std::shared_ptr<Gtk::ListBox> lstbox){
 		//remove excess rows
 		if(torrents!=NULL){
 			for(int i= torrents->size();i<lrows.size();i++){
-				lstbox.get()->remove(*lrows[i]);	
+				lstbox->remove(*lrows[i]);	
 			}
 		}
 		//refresh toolbar buttons
@@ -80,7 +80,7 @@ static void updateThread(std::shared_ptr<Gtk::ListBox> lstbox){
 			free(torrents);
 		}
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+		std::this_thread::sleep_for(std::chrono::milliseconds(5500));
 	}
 }
 
@@ -156,10 +156,9 @@ int main (int args,char **argv){
 	bar->show();
 	
 
-	std::thread t(updateThread,lstbox);
+	std::thread t(updateThread,lstbox.get());
 	t.detach();
 
-	lstbox.reset();
 	return app->run(window);
 
 }

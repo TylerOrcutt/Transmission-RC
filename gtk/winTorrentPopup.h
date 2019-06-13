@@ -6,7 +6,7 @@ namespace TransmissionRC{
 
 	class winTorrentPopup:public Gtk::Window {
 		public:
-			winTorrentPopup(void(*)(std::shared_ptr<Gtk::ListBox>));
+			winTorrentPopup(void(*)(Gtk::ListBox*));
 			bool lost_Focus(GdkEventFocus*);
 
 	};
