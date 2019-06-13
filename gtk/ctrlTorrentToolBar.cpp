@@ -3,12 +3,12 @@ using namespace TransmissionRC;
  static void btnClick(Gtk::Widget *widget){
 
 }
-ctrlTorrentToolBar::ctrlTorrentToolBar(Gtk::ListBox * box) : Gtk::Toolbar(){
+ctrlTorrentToolBar::ctrlTorrentToolBar(std::shared_ptr<Gtk::ListBox>  lbox) : Gtk::Toolbar(){
 	
 	this->set_toolbar_style(Gtk::TOOLBAR_BOTH);
 	//this->set_icon_size(Gtk::ICON_SIZE_SMALL_TOOLBAR);
 
-	this->lstBox = box;
+	this->lstBox = lbox;
 //Open
 	btnOpen = new Gtk::ToolButton();
 	btnOpen->set_label("Open");
@@ -35,7 +35,7 @@ ctrlTorrentToolBar::ctrlTorrentToolBar(Gtk::ListBox * box) : Gtk::Toolbar(){
 //Pause
 	btnPause= new Gtk::ToolButton();
 	btnPause->set_label("Pause");
-	btnPause->set_sensitive(false);
+	//btnPause->set_sensitive(false);
 	this->append(*btnPause);
 	btnPause->show();
 //Pause img
@@ -47,7 +47,7 @@ ctrlTorrentToolBar::ctrlTorrentToolBar(Gtk::ListBox * box) : Gtk::Toolbar(){
 //Resume
 	btnResume = new Gtk::ToolButton();
 	btnResume->set_label("Start");
-	btnResume->set_sensitive(false);
+	//btnResume->set_sensitive(false);
 	this->append(*btnResume);
 	btnResume->show();
 //Resume img
@@ -89,23 +89,28 @@ void ctrlTorrentToolBar::tbDelete_Clicked(){
 void ctrlTorrentToolBar::tbPause_Clicked(){
 
 	if(lstBox != NULL){
+
+		mtx->lock();
 		ctrlTorrentListItem * item = 
-				(ctrlTorrentListItem *)lstBox->get_selected_row();
+				(ctrlTorrentListItem *)lstBox.get()->get_selected_row();
 		if(item!=NULL){
 			stopTorrent(item->torrent.ID);
 		}
+		mtx->unlock();
 	}
-
 }
 
 void ctrlTorrentToolBar::tbResume_Clicked(){
 
 	if(lstBox != NULL){
+
+		mtx->lock();
 		ctrlTorrentListItem * item = 
-				(ctrlTorrentListItem *)lstBox->get_selected_row();
+				(ctrlTorrentListItem *)lstBox.get()->get_selected_row();
 		if(item!=NULL){
 			resumeTorrent(item->torrent.ID);
 		}
+
+		mtx->unlock();
 	}
-	
 }

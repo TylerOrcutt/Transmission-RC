@@ -3,7 +3,7 @@
 
 using namespace TransmissionRC;
 
-winTorrentPopup::winTorrentPopup(void(*updatefnc)(Gtk::ListBox*lstbox)):Gtk::Window(Gtk::WINDOW_TOPLEVEL){
+winTorrentPopup::winTorrentPopup(void(*updatefnc)(std::shared_ptr<Gtk::ListBox>lstbox)):Gtk::Window(Gtk::WINDOW_TOPLEVEL){
 	
 	int width = 350,height = 375;
 	this->set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
@@ -30,7 +30,7 @@ winTorrentPopup::winTorrentPopup(void(*updatefnc)(Gtk::ListBox*lstbox)):Gtk::Win
 	this->move(x-width/2,y+yoffset);
 	this->show();
 	
-	Gtk::ListBox * lstbox = new Gtk::ListBox();
+	std::shared_ptr<Gtk::ListBox> lstbox = std::make_shared<Gtk::ListBox>();
 	Gtk::Box *box = new Gtk::Box(Gtk::ORIENTATION_VERTICAL);
 	
 	//t->get_vbox()->set_border_width(0);

@@ -22,9 +22,10 @@ namespace TransmissionRC{
 			Gtk::ToolButton * btnResume;
 			
 		  	Gtk::Image *imgPause;			
-			Gtk::ListBox * lstBox;
+			std::shared_ptr<Gtk::ListBox> lstBox;
+			std::mutex *mtx;
 		public:
-			ctrlTorrentToolBar(Gtk::ListBox *);	
+			ctrlTorrentToolBar(std::shared_ptr<Gtk::ListBox>);	
 			void tbOpen_Clicked();
 			void tbDelete_Clicked();
 			void tbPause_Clicked();
