@@ -30,7 +30,7 @@ winTorrentPopup::winTorrentPopup(void(*updatefnc)(Gtk::ListBox *)):Gtk::Window(G
 	this->move(x-width/2,y+yoffset);
 	this->show();
 	
-	std::shared_ptr<Gtk::ListBox> lstbox = std::make_shared<Gtk::ListBox>();
+	lstbox = std::make_shared<Gtk::ListBox>();
 	Gtk::Box *box = new Gtk::Box(Gtk::ORIENTATION_VERTICAL);
 	
 	//t->get_vbox()->set_border_width(0);
