@@ -37,7 +37,7 @@ void TransmissionRC::updateThread(){
 
 	mtx.unlock();
 	drawScreen();
-	std::this_thread::sleep_for(std::chrono::milliseconds(5500));
+	std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 
 	}
 }
