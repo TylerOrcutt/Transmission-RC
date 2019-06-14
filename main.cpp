@@ -9,7 +9,7 @@
 #include "config.h"
 #include "args.h"
 #include "termInterface.h"
-
+#include "Utility.h"
 
 using namespace TransmissionRC;
 

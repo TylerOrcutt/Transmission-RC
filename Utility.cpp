@@ -3,16 +3,15 @@
 using namespace TransmissionRC;
 
 std::string TransmissionRC::Utility::convertTransferSpeed(int bps){
-	 double  kbps = bps/1000.00;
+static const char *  xrate[] = {"B/s","KB/s","MB/s","GB/s","TB/s","PB/s"};
+static const int xsize = 6;
 	std::stringstream ss;
+	for(int i=0;i<xsize;i++){
+		if((bps>>(i*10)) <= 1000 || i==xsize-1){
+			ss<<(float)bps/(1000^(1<<(i*10)))<<" "<<xrate[i];
+			break;
+		}
 
-	
-	 if(kbps/1000 > 1){
-		ss<<kbps/1000<<" MB/s";
-	}else{
-		ss<<kbps<< " KB/s";
-	
 	}
-	
 return ss.str();
 }
