@@ -9,7 +9,7 @@ namespace TransmissionRC{
 
 
 	bool authenticate();
-	std::vector<TransmissionRC::rcTorrent> * getTorrents();
+	std::unique_ptr<std::vector<TransmissionRC::rcTorrent>>  getTorrents();
 
 	bool resumeTorrent(int id);
 	bool resumeTorrent(int **id);
@@ -22,6 +22,6 @@ namespace TransmissionRC{
 	bool removeTorrent(int id);
 	bool removeTorrent(int **id);
 
-	bool updateBlockList();
+	int updateBlockList();
 
 }

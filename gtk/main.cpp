@@ -32,9 +32,9 @@ static void updateThread(Gtk::ListBox *lstbox){
 
 	while(true){
 
-		std::vector<rcTorrent> * torrents = getTorrents();		
+		auto torrents = getTorrents();		
 
-		if(torrents==NULL){
+		if(torrents==nullptr){
 
 			if(TransmissionRC::authenticate()){
 				torrents=getTorrents();
@@ -44,7 +44,7 @@ static void updateThread(Gtk::ListBox *lstbox){
 		mtx.lock();	
 		std::vector<Gtk::Widget*> lrows = lstbox->get_children();
 		//need to make this less shitty
-		for(int i=0;torrents!=NULL && i<torrents->size();i++){
+		for(int i=0;torrents!=nullptr && i<torrents->size();i++){
 
 			if(i>=lrows.size()){
 				
@@ -61,7 +61,7 @@ static void updateThread(Gtk::ListBox *lstbox){
 		
 		}
 		//remove excess rows
-		if(torrents!=NULL){
+		if(torrents!=nullptr){
 			for(int i= torrents->size();i<lrows.size();i++){
 				lstbox->remove(*lrows[i]);	
 			}
@@ -76,9 +76,6 @@ static void updateThread(Gtk::ListBox *lstbox){
 			
 		mtx.unlock();
 		//lstRowSelected(row);
-		if(torrents!=NULL){
-			free(torrents);
-		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(5500));
 	}

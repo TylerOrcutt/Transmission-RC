@@ -6,11 +6,11 @@ using namespace TransmissionRC;
 bool TransmissionRC::authenticate(){
 
 	TransmissionRequest request = MakeRequest();
-	TransmissionResponse response = TransmissionRC::DoRequest(request);
+	auto response = TransmissionRC::DoRequest(request);
 	
-	if(response.statusCode == 200 || 
-			(response.sessionID !="" && response.statusCode==409)) { 
-		TransmissionRC::Config::sessionID = response.sessionID;	
+	if(response->statusCode == 200 || 
+			(response->sessionID !="" && response->statusCode==409)) { 
+		TransmissionRC::Config::sessionID = response->sessionID;	
 		return true;
 	}
 	
@@ -18,11 +18,12 @@ bool TransmissionRC::authenticate(){
 }
 
 
-std::vector<rcTorrent>*TransmissionRC::getTorrents(){
-	std::vector<rcTorrent> * torrents=new std::vector<rcTorrent>;
+std::unique_ptr<std::vector<rcTorrent>>  TransmissionRC::getTorrents(){
+	std::unique_ptr<std::vector<rcTorrent>>  torrents=
+					std::make_unique<std::vector<rcTorrent>>();
 
 	TransmissionRequest request = MakeRequest();
-	//request.sessionID = Config::sessionID;
+
 	request.requestData = "{ \"arguments\":{\"fields\":["
 							"\"id\","
 						   	"\"name\","
@@ -35,9 +36,9 @@ std::vector<rcTorrent>*TransmissionRC::getTorrents(){
 							"]},\""
 							"method\":\"torrent-get\"}";
 
-	TransmissionResponse response =	DoRequest(request);
+	auto response = DoRequest(request);
 	std::stringstream ss;
-	ss<<response.response;
+	ss<<response->response;
 
 	boost::property_tree::ptree pt;
 
@@ -55,7 +56,7 @@ std::vector<rcTorrent>*TransmissionRC::getTorrents(){
 		torrent.rateUpload = v.second.get<int>("rateUpload");
 		torrent.totalSize = v.second.get<unsigned long>("totalSize");
 		torrent.percentDone = v.second.get<double>("percentDone");
-		torrents->push_back(torrent);
+		torrents.get()->push_back(torrent);
 
 		if(torrent.Status==TransmissionRC::TR_STATUS_SEED
 		  && Config::config["stopSeeding"]=="true"){
@@ -65,14 +66,11 @@ std::vector<rcTorrent>*TransmissionRC::getTorrents(){
 	    }
 
 	}catch(std::exception const &e){
-//	    std::cout<<"error: "<<e.what()<<"\r\n";
-//	std::cout<<response.response<<std::endl
-//	<<"\r\n'"<<Config::sessionID<<"'"<<std::endl;
-	   free(torrents);
-	   return NULL;
+
+	   return nullptr;
 	}
 
-	return torrents;
+	return std::move(torrents);
 }
 
 
@@ -83,9 +81,9 @@ bool TransmissionRC::resumeTorrent(int id){
 	std::stringstream req;
 	req<<"{ \"arguments\":{\"ids\":["<<id<<"]},\"method\":\"torrent-start\"}";
 	request.requestData =req.str();
-	TransmissionResponse response =	DoRequest(request);
+	auto response = DoRequest(request);
 
-	if(response.statusCode == 200){
+	if(response->statusCode == 200){
 		return true;
 	}
 	return false;
@@ -99,9 +97,10 @@ bool TransmissionRC::stopTorrent(int id){
 	std::stringstream req;
 	req<<"{ \"arguments\":{\"ids\":["<<id<<"]},\"method\":\"torrent-stop\"}";
 	request.requestData =req.str();
-	TransmissionResponse response =	DoRequest(request);
 
-	if(response.statusCode == 200){
+	auto response = DoRequest(request);
+
+	if(response->statusCode == 200){
 		return true;
 	}
 	return false;
@@ -114,10 +113,10 @@ bool TransmissionRC::addTorrent(std::string URL){
 	request.requestData = "{ \"arguments\":{\"filename\":"
 				"\""+URL+"\"},\"method\":\"torrent-add\"}";
 	std::cout<<request.requestData<<std::endl<<std::endl;
-	TransmissionResponse response =	DoRequest(request);
+	auto response = DoRequest(request);
 	//std::cout<<response.response;
 
-	if(response.statusCode == 200){
+	if(response->statusCode == 200){
 		return true;
 	}
 	return false;
@@ -132,9 +131,9 @@ bool TransmissionRC::removeTorrent(int id){
 	req<<"{ \"arguments\":{\"ids\":["<<id<<"]},\"method\":\"torrent-remove\"}";
 	request.requestData =req.str();
 
-	TransmissionResponse response =	DoRequest(request);
+	auto response = DoRequest(request);
 
-	if(response.statusCode == 200){
+	if(response->statusCode == 200){
 		return true;
 	}
 	return false;
@@ -142,19 +141,39 @@ bool TransmissionRC::removeTorrent(int id){
 
 
 
-bool TransmissionRC::updateBlockList(){
+int TransmissionRC::updateBlockList(){
 
 	TransmissionRequest request = MakeRequest();
 
 	request.requestData = "{\"method\":\"blocklist-update\"}";
-	std::cout<<request.requestData<<std::endl<<std::endl;
-	TransmissionResponse response =	DoRequest(request);
 
-	//std::cout<<response.response;
+	auto response = DoRequest(request);
 
-	if(response.statusCode == 200){
-		return true;
+	std::stringstream ss;
+	ss<<response->response;	
+
+	boost::property_tree::ptree pt;
+
+	try{
+	    boost::property_tree::read_json(ss,pt);
+
+	    BOOST_FOREACH(boost::property_tree::ptree::value_type &v,
+					pt.get_child("arguments")){
+			return v.second.get_value<int>();
+
+		}
+
+	    
+
+	}catch(std::exception const &e){
+
+		return -1;
 	}
-	return false;
+
+	if(response->statusCode == 200){
+		return 0;
+	}
+	return -1;
+	
 
 }

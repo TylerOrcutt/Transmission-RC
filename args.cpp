@@ -7,7 +7,7 @@ void TransmissionRC::i3Status(){
 	int seeding = 0;
 	int leeching = 0;
 	int paused = 0;
-	std::vector<rcTorrent> * torrents = getTorrents();
+	auto  torrents = getTorrents();
 	for(int i=0;torrents!=NULL && i<torrents->size();i++){
 		switch((*torrents)[i].Status){
 			case 0:
