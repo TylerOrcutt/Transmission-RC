@@ -2,7 +2,7 @@
 //TODO clean this shit up
 using namespace TransmissionRC;
 
-std::vector<rcTorrent> *torrents;
+std::unique_ptr<std::vector<rcTorrent>> torrents;
 
 tcWindow torwin;
 
@@ -21,7 +21,7 @@ void TransmissionRC::updateThread(){
 	mtx.lock();
 
 
-	std::vector<rcTorrent> *tt = TransmissionRC::getTorrents();
+	auto tt = TransmissionRC::getTorrents();
 
 	if(tt==NULL){
 		if(TransmissionRC::authenticate()){
@@ -31,11 +31,8 @@ void TransmissionRC::updateThread(){
 		}
 	}else{
 
-		if(torrents!=NULL){
-			free(torrents);
-			torrents=NULL;
-		}
-		torrents=tt;
+		torrents=nullptr;
+		torrents=std::move(tt);
 	}
 
 	mtx.unlock();

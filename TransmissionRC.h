@@ -4,6 +4,7 @@
 #include<iostream>
 #include<string.h>
 #include<map>
+#include<memory>
 namespace TransmissionRC{
 
 
@@ -58,7 +59,7 @@ namespace TransmissionRC{
  void init();
  void cleanup();
  TransmissionRequest MakeRequest();
- TransmissionResponse & DoRequest(TransmissionRequest);
+ std::unique_ptr<TransmissionResponse> DoRequest(TransmissionRequest);
 
 
 

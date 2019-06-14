@@ -12,7 +12,7 @@ void TransmissionRC::cleanup(){
 }
 
 
-TransmissionRC::TransmissionResponse & TransmissionRC::DoRequest(
+std::unique_ptr<TransmissionRC::TransmissionResponse> TransmissionRC::DoRequest(
 						TransmissionRequest request){
 	std::string readBuffer;
 	std::map<std::string,std::string>headerBuffer;
@@ -46,16 +46,17 @@ TransmissionRC::TransmissionResponse & TransmissionRC::DoRequest(
 	headers=NULL;
 	curl_easy_cleanup(hdlr);	
 //response	
-	TransmissionRC::TransmissionResponse *response = new TransmissionResponse();
-	response->response = readBuffer;
-	response->sessionID = headerBuffer["sessionID"];
+	std::unique_ptr<TransmissionRC::TransmissionResponse> response =
+					std::make_unique<TransmissionRC::TransmissionResponse>();
+	response.get()->response = readBuffer;
+	response.get()->sessionID = headerBuffer["sessionID"];
 	try{
-		response->statusCode = std::stoi(headerBuffer["status"]);
+		response.get()->statusCode = std::stoi(headerBuffer["status"]);
 	}catch (std::exception const &e){
 
-	response->statusCode = 0;
+	response.get()->statusCode = 0;
 	}
-  return *response;
+  return std::move(response);
  }
 
  TransmissionRequest TransmissionRC::MakeRequest(){

@@ -49,8 +49,8 @@ void handleArgs(int args,char ** argv){
 		}
 	
 		if(std::string(argv[i]) == "-t"){
-			std::vector<rcTorrent> *torrents = getTorrents();
-			for(int t=0;torrents!=NULL && t<torrents->size();t++){
+			auto torrents = getTorrents();
+			for(int t=0;torrents!=nullptr && t<torrents->size();t++){
 			
 				std::cout<<(*torrents)[t].ID<<":"
 					 <<(*torrents)[t].Name
@@ -59,7 +59,6 @@ void handleArgs(int args,char ** argv){
 					 <<" "<<(*torrents)[t].percentDone
 					 <<std::endl;
 			}
-			 if(torrents!=NULL){ free(torrents);}
 			i--;
 		}
 	
@@ -87,8 +86,9 @@ void handleArgs(int args,char ** argv){
 		}
 
 		if(std::string(argv[i])=="-blocklist-update"){
-			if(TransmissionRC::updateBlockList()){
-				std::cout<<"Updated success\r\n";
+			int c=-1;
+			if((c=TransmissionRC::updateBlockList())>-1){
+				std::cout<<"Updated "<<c<<"\r\n";
 			}else{
 				std::cout<<"Updated failed\r\n";
 			}
