@@ -3,7 +3,7 @@
 
 using namespace TransmissionRC;
 
-winTorrentPopup::winTorrentPopup(void(*updatefnc)(std::shared_ptr<Gtk::ListBox>lstbox)):Gtk::Window(Gtk::WINDOW_TOPLEVEL){
+winTorrentPopup::winTorrentPopup(void(*updatefnc)(Gtk::ListBox *)):Gtk::Window(Gtk::WINDOW_TOPLEVEL){
 	
 	int width = 350,height = 375;
 	this->set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
@@ -30,7 +30,7 @@ winTorrentPopup::winTorrentPopup(void(*updatefnc)(std::shared_ptr<Gtk::ListBox>l
 	this->move(x-width/2,y+yoffset);
 	this->show();
 	
-	std::shared_ptr<Gtk::ListBox> lstbox = std::make_shared<Gtk::ListBox>();
+	lstbox = std::make_shared<Gtk::ListBox>();
 	Gtk::Box *box = new Gtk::Box(Gtk::ORIENTATION_VERTICAL);
 	
 	//t->get_vbox()->set_border_width(0);
@@ -54,7 +54,7 @@ winTorrentPopup::winTorrentPopup(void(*updatefnc)(std::shared_ptr<Gtk::ListBox>l
 					&winTorrentPopup::lost_Focus));
 
 
-	std::thread t(*updatefnc,lstbox);
+	std::thread t(*updatefnc,lstbox.get());
 	t.detach();
 }
 bool winTorrentPopup::lost_Focus(GdkEventFocus* event){
