@@ -8,7 +8,11 @@ void TransmissionRC::i3Status(){
 	int leeching = 0;
 	int paused = 0;
 	auto  torrents = getTorrents();
+	int downbps =0;
+	int upbps =0;
 	for(int i=0;torrents!=NULL && i<torrents->size();i++){
+		downbps+= (*torrents)[i].rateDownload;
+		upbps += (*torrents)[i].rateUpload;
 		switch((*torrents)[i].Status){
 			case 0:
 				paused++;
@@ -25,7 +29,9 @@ void TransmissionRC::i3Status(){
 			break;
 		}
 	}
-
-	std::cout<<"⯅ "<<seeding<<" ⯆ "<<leeching<<" ▮▮ "<<paused;
+	std::cout.precision(std::numeric_limits<float>::digits10);
+	std::cout<<"D: "<<Utility::convertTransferSpeed(downbps)
+		<<" U: "<<Utility::convertTransferSpeed(upbps)
+		<<" ⯅ "<<seeding<<" ⯆ "<<leeching<<" ▮▮ "<<paused;
 
 }
