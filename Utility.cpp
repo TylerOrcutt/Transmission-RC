@@ -8,7 +8,7 @@ static const int xsize = 6;
 	std::stringstream ss;
 	for(int i=0;i<xsize;i++){
 		if((bps>>(i*10)) <= 1000 || i==xsize-1){
-			ss<<(float)bps/(1000^(1<<(i*10)))<<" "<<xrate[i];
+			ss<<(float)bps/(1000^(10*i))<<" "<<xrate[i];
 			break;
 		}
 
