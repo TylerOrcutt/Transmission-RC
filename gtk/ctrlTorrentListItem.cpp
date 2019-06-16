@@ -23,8 +23,8 @@ ctrlTorrentListItem::ctrlTorrentListItem(rcTorrent torrent):Gtk::ListBoxRow(){
 	
 	if(torrent.Status>0){
 
-		ss<<" D:"<<Utility::convertTransferSpeed(torrent.rateDownload);
-		ss<<" U:"<<Utility::convertTransferSpeed(torrent.rateUpload);
+		ss<<" D:"<<Utility::convertTransferSpeed(torrent.rateDownload).get();
+		ss<<" U:"<<Utility::convertTransferSpeed(torrent.rateUpload).get();
 	}	
 
 	lblStatus = new Gtk::Label(ss.str().c_str(),Gtk::ALIGN_START,Gtk::ALIGN_START);
@@ -62,8 +62,8 @@ void ctrlTorrentListItem::update(rcTorrent torrent){
 	
 	if(torrent.Status>0){
 
-		ss<<" D:"<<Utility::convertTransferSpeed(torrent.rateDownload);
-		ss<<" U:"<<Utility::convertTransferSpeed(torrent.rateUpload);
+		ss<<" D:"<<Utility::convertTransferSpeed(torrent.rateDownload).get();
+		ss<<" U:"<<Utility::convertTransferSpeed(torrent.rateUpload).get();
 	}	
 	lblStatus->set_label(ss.str().c_str());
 

@@ -19,7 +19,7 @@ std::map<std::string,std::string> Config::config;
 std::string Config::sessionID="";
 
 int main(int args, char **argv){
-	
+
 	Config::config = Config::loadConfig();
 
 //need a session ID
@@ -31,7 +31,7 @@ int main(int args, char **argv){
 
 	if(args<=1){
 //start UI
-		TransmissionRC::runUI();
+		TransmissionRC::Terminal::runUI();
 	}else{
 	 	handleArgs(args,argv);
 	}

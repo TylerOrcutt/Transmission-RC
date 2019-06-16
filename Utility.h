@@ -1,9 +1,8 @@
 #pragma once
-#include<iostream>
-#include <sstream>
+#include<memory>
 
 namespace TransmissionRC::Utility{
-std::string convertTransferSpeed(int);
+	std::unique_ptr<char[]> convertTransferSpeed(int);
 
 
 }

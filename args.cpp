@@ -30,8 +30,8 @@ void TransmissionRC::i3Status(){
 		}
 	}
 	std::cout.precision(std::numeric_limits<float>::digits10);
-	std::cout<<"D: "<<Utility::convertTransferSpeed(downbps)
-		<<" U: "<<Utility::convertTransferSpeed(upbps)
+	std::cout<<"D: "<<Utility::convertTransferSpeed(downbps).get()
+		<<" U: "<<Utility::convertTransferSpeed(upbps).get()
 		<<" ⯅ "<<seeding<<" ⯆ "<<leeching<<" ▮▮ "<<paused;
 
 }
