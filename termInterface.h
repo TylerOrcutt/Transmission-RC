@@ -4,26 +4,21 @@
 #include<string>
 #include<thread>
 #include<mutex>
+#include <signal.h>
+//#include "tcWindow.h"
+#include "torWindow.h"
+#include "infoWindow.h"
 #include"TransmissionRPCRequest.h"
 #include "Utility.h"
 
-namespace TransmissionRC{
+namespace TransmissionRC::Terminal{
 	void runUI();
 	void drawScreen();
 	void getKeyPress();
 	void updateThread();
-	struct	tcWindow{
-		int offset=0;
-		int my=0,mx=0;
-		int posx=0,posy=0;
-		WINDOW * win;
-		int winH=0;
-		int winW=0;
-	~tcWindow(){
-		delwin(win);
-	}
-	};
 
+	void handleCommand();
+	void resizeWindow(int);
 	
 	enum{
 		Success=0,
