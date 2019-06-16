@@ -19,11 +19,10 @@ namespace TransmissionRC::Terminal{
 
 		tcWindow(int x,int y,int width,int height){
 
-			//oops this is backwards 
-			winH = width;
-			winW = height;
+			winH = height;
+			winW = width;
 
-			win = newwin(winH,winW,0,0);
+			win = newwin(winH,winW,y,x);
 			keypad(stdscr,true);
 			keypad(win,true);
 
@@ -32,11 +31,8 @@ namespace TransmissionRC::Terminal{
 			delwin(win);
 		}
 
-		virtual void keypress(int ch){
-
-		
-		}
 
 		virtual void Draw(std::shared_ptr<std::vector<rcTorrent>>);
+		virtual void Draw(rcTorrent);
 	};
 }

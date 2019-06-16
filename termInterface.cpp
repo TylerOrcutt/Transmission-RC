@@ -6,13 +6,15 @@ using namespace TransmissionRC::Terminal;
 
 	std::shared_ptr<std::vector<rcTorrent>> torrents;
 
-	std::unique_ptr<tcWindow> torwin=nullptr;
+	std::unique_ptr<torWindow> torwin=nullptr;
+	std::unique_ptr<infoWindow> infowin=nullptr;
 
 	int screenmx,screenmy;
 	bool running=true;
 	std::mutex mtx;
 	std::string statusMsg="";
 
+	bool showInfo = false;
 	bool isInserting=false;
 	int pchar=0;
 	std::string insertTxt="";
@@ -61,13 +63,14 @@ void TransmissionRC::Terminal::runUI(){
 	start_color();
 
 	signal(SIGWINCH,resizeWindow);
-	getmaxyx(stdscr,screenmx,screenmy);
+	getmaxyx(stdscr,screenmy,screenmx);
 	//nodelay(stdscr,true);
 	init_pair(1,COLOR_WHITE,COLOR_BLACK);
 	init_pair(2,COLOR_WHITE, COLOR_BLUE);
 
 
-	torwin = std::make_unique<tcWindow>(0,0,screenmx,screenmy);
+	torwin = std::make_unique<torWindow>(0,0,screenmx,screenmy);
+	infowin = std::make_unique<infoWindow>(screenmx/2,0,screenmx/2,screenmy);
 
 	clear();
 	refresh();
@@ -147,6 +150,15 @@ void TransmissionRC::Terminal::getKeyPress(){
 
 	break;
 
+	case 'i':
+		if((*torwin).winW==screenmx){
+			showInfo=true;
+			(*torwin).winW/=2;	
+		}else{
+			showInfo=false;
+			(*torwin).winW=screenmx;		
+		}	
+	break;
 	case 'y': 
 
 		if( pchar=='d'){
@@ -195,19 +207,23 @@ void TransmissionRC::Terminal::getKeyPress(){
 void TransmissionRC::Terminal::drawScreen(){
 
 	//werase(torwin.win);
-	getmaxyx(stdscr,screenmx,screenmy);
+	getmaxyx(stdscr,screenmy,screenmx);
 
 	mtx.lock();
 	(*torwin).Draw(torrents);
+	if(showInfo){
+		int tid = torwin.get()->my/4 + torwin.get()->offset;
+		(*infowin).Draw((*torrents)[tid]);
+	}
 
 	mtx.unlock();
 //draw status msg;
 	if(isInserting){
 		std::string itxt = ":" + insertTxt;
-		mvwprintw(stdscr,screenmx-1,0,itxt.c_str());
+		mvwprintw(stdscr,screenmy-1,0,itxt.c_str());
 		//mvwprintw((*torwin).win,screenmy-1,0,itxt.c_str());
 	}else{
-		mvwprintw(stdscr,screenmx-1,0,statusMsg.c_str());
+		mvwprintw(stdscr,screenmy-1,0,statusMsg.c_str());
 		//mvwprintw((*torwin).win,screenmy-1,0,statusMsg.c_str());
 	}
 	
@@ -225,7 +241,7 @@ void TransmissionRC::Terminal::handleCommand(){
 		int  cnt = updateBlockList();
 		if(cnt >-1){
 			std::stringstream ss;
-			ss<<"block list updated, "<<cnt<<".";	
+			ss<<"block list updated, "<<cnt<<" records found.";	
 			statusMsg = ss.str();
 		}else {
 			statusMsg = "update Failed";

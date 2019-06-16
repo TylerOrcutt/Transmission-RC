@@ -5,7 +5,9 @@
 #include<thread>
 #include<mutex>
 #include <signal.h>
-#include "tcWindow.h"
+//#include "tcWindow.h"
+#include "torWindow.h"
+#include "infoWindow.h"
 #include"TransmissionRPCRequest.h"
 #include "Utility.h"
 
