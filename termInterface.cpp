@@ -206,8 +206,7 @@ void TransmissionRC::Terminal::getKeyPress(){
 
 void TransmissionRC::Terminal::drawScreen(){
 
-	//werase(torwin.win);
-	getmaxyx(stdscr,screenmy,screenmx);
+	//getmaxyx(stdscr,screenmy,screenmx);
 
 	mtx.lock();
 	(*torwin).Draw(torrents);
@@ -221,14 +220,11 @@ void TransmissionRC::Terminal::drawScreen(){
 	if(isInserting){
 		std::string itxt = ":" + insertTxt;
 		mvwprintw(stdscr,screenmy-1,0,itxt.c_str());
-		//mvwprintw((*torwin).win,screenmy-1,0,itxt.c_str());
 	}else{
 		mvwprintw(stdscr,screenmy-1,0,statusMsg.c_str());
-		//mvwprintw((*torwin).win,screenmy-1,0,statusMsg.c_str());
 	}
 	
 	wrefresh(stdscr);
-	//wrefresh((*torwin).win);
 }
 
 
