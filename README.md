@@ -3,6 +3,7 @@ remote client for transmission daemon
 
 Terminal UI
 ![alt text](https://github.com/TylerOrcutt/Transmission-RC/blob/master/screens/terminal.png)
+![alt text](https://github.com/TylerOrcutt/Transmission-RC/blob/master/screens/terminal2.png)
 Dependencies:
 <br />
 -curl
