@@ -5,6 +5,7 @@
 #include<string.h>
 #include<map>
 #include<memory>
+#include<vector>
 namespace TransmissionRC{
 
 
@@ -45,6 +46,13 @@ namespace TransmissionRC{
 				    };
 
  typedef struct{
+	int bytesCompleted;
+	int length;
+	std::string name;
+ }rcFile;
+
+typedef struct{
+	public:
 	int ID;
 	std::string Name;
 	int Status;
@@ -53,6 +61,16 @@ namespace TransmissionRC{
 	bool isFinished;
 	unsigned long totalSize;
 	double percentDone=0;
+	int eta=-1;
+	//info panel vars/
+	int desiredAvailable =0;
+	int uploadedEver =0;
+
+	std::string errorString ="";
+	std::string comment ="";
+	
+	std::vector<rcFile> files;
+
 }rcTorrent;
 
 

@@ -19,8 +19,7 @@ bool TransmissionRC::authenticate(){
 
 
 std::unique_ptr<std::vector<rcTorrent>>  TransmissionRC::getTorrents(){
-	std::unique_ptr<std::vector<rcTorrent>>  torrents=
-					std::make_unique<std::vector<rcTorrent>>();
+	auto  torrents = std::make_unique<std::vector<rcTorrent>>();
 
 	TransmissionRequest request = MakeRequest();
 
@@ -32,7 +31,17 @@ std::unique_ptr<std::vector<rcTorrent>>  TransmissionRC::getTorrents(){
 							"\"rateUpload\","
 							"\"isFinished\","
 							"\"totalSize\","
-							"\"percentDone\""
+							"\"percentDone\","
+							"\"eta\","
+							//
+							"\"desiredAvailable\","
+							"\"uploadedEver\","
+							//"\"\","
+							//"\"\","
+							//"\"\","
+							"\"files\","
+							"\"errorString\","
+							"\"comment\""
 							"]},\""
 							"method\":\"torrent-get\"}";
 
@@ -56,7 +65,27 @@ std::unique_ptr<std::vector<rcTorrent>>  TransmissionRC::getTorrents(){
 		torrent.rateUpload = v.second.get<int>("rateUpload");
 		torrent.totalSize = v.second.get<unsigned long>("totalSize");
 		torrent.percentDone = v.second.get<double>("percentDone");
-		torrents.get()->push_back(torrent);
+		torrent.eta = v.second.get<int>("eta");
+		
+		torrent.desiredAvailable = v.second.get<int>("desiredAvailable");
+		torrent.uploadedEver = v.second.get<int>("uploadedEver");
+
+		torrent.errorString = v.second.get<std::string>("errorString");
+		torrent.comment = v.second.get<std::string>("comment");
+
+		//sub files
+		boost::property_tree::ptree subt = v.second;
+		
+		BOOST_FOREACH(boost::property_tree::ptree::value_type &vs,
+							subt.get_child("files")){
+
+					rcFile file;
+					file.name = 
+						vs.second.get<std::string>("name");
+					torrent.files.push_back(file);
+		}	
+
+		torrents->push_back(torrent);
 
 		if(torrent.Status==TransmissionRC::TR_STATUS_SEED
 		  && Config::config["stopSeeding"]=="true"){
