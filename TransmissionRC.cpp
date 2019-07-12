@@ -56,6 +56,7 @@ std::unique_ptr<TransmissionRC::TransmissionResponse> TransmissionRC::DoRequest(
 
 	response.get()->statusCode = 0;
 	}
+
   return std::move(response);
  }
 

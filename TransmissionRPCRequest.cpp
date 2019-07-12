@@ -48,6 +48,10 @@ std::unique_ptr<std::vector<rcTorrent>>  TransmissionRC::getTorrents(){
 	auto response = DoRequest(request);
 	std::stringstream ss;
 	ss<<response->response;
+#ifdef debug
+
+	//std::cout<<response->response<<"\r\n";
+#endif
 
 	boost::property_tree::ptree pt;
 
@@ -65,10 +69,10 @@ std::unique_ptr<std::vector<rcTorrent>>  TransmissionRC::getTorrents(){
 		torrent.rateUpload = v.second.get<int>("rateUpload");
 		torrent.totalSize = v.second.get<unsigned long>("totalSize");
 		torrent.percentDone = v.second.get<double>("percentDone");
-		torrent.eta = v.second.get<int>("eta");
+		//torrent.eta = v.second.get<int>("eta");
 		
-		torrent.desiredAvailable = v.second.get<int>("desiredAvailable");
-		torrent.uploadedEver = v.second.get<int>("uploadedEver");
+		//torrent.desiredAvailable = v.second.get<int>("desiredAvailable");
+		//torrent.uploadedEver = v.second.get<int>("uploadedEver");
 
 		torrent.errorString = v.second.get<std::string>("errorString");
 		torrent.comment = v.second.get<std::string>("comment");
@@ -135,15 +139,25 @@ bool TransmissionRC::stopTorrent(int id){
 	return false;
 }
 
-bool TransmissionRC::addTorrent(std::string URL){
+bool TransmissionRC::addTorrent(std::string path){
 	
 	TransmissionRequest request = MakeRequest();
+	
+	if(path.substr(0,7) == "http://" || path.substr(0,8) == "https://"){
 
-	request.requestData = "{ \"arguments\":{\"filename\":"
-				"\""+URL+"\"},\"method\":\"torrent-add\"}";
+		request.requestData = "{ \"arguments\":{\"filename\":"
+			"\""+path+"\"},\"method\":\"torrent-add\"}";
+	}else{
+		
+		std::string data = TransmissionRC::Utility::readFile(path.c_str());
+
+		request.requestData = "{ \"arguments\":{\"metainfo\":"
+			"\""+data+"\"},\"method\":\"torrent-add\"}";
+	}
+	
 	std::cout<<request.requestData<<std::endl<<std::endl;
 	auto response = DoRequest(request);
-	//std::cout<<response.response;
+	std::cout<<response->response;
 
 	if(response->statusCode == 200){
 		return true;

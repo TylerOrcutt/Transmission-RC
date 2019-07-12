@@ -1,6 +1,7 @@
 #pragma once
 #ifndef __TRANSMISSIONRC_H_
 #define __TRANSMISSIONRC_H_
+#define debug
 #include<iostream>
 #include<string.h>
 #include<map>
