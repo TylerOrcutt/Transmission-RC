@@ -143,7 +143,9 @@ bool TransmissionRC::addTorrent(std::string path){
 	
 	TransmissionRequest request = MakeRequest();
 	
-	if(path.substr(0,7) == "http://" || path.substr(0,8) == "https://"){
+	if(path.substr(0,7) == "http://"
+		       	|| path.substr(0,8) == "https://"
+			|| path.substr(0,11)=="magnet:?xt="){
 
 		request.requestData = "{ \"arguments\":{\"filename\":"
 			"\""+path+"\"},\"method\":\"torrent-add\"}";
